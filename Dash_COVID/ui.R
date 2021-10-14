@@ -3,10 +3,12 @@ library(shinydashboard)
 library(shinydashboardPlus)
 library(plotly)
 
+
+#Header bar of the dashboard (ie le titre du projet)
 header<-dashboardHeader(title = "Dashboard sur les données du COVID", titleWidth = 380)
 
 
-
+#Menu depliant avec les deux onglets et les inputs du departement etc...
 sidebar<-dashboardSidebar(sidebarMenu(
   sliderInput("bins",
               "Number of bins:",
@@ -18,13 +20,14 @@ sidebar<-dashboardSidebar(sidebarMenu(
   actionButton("bout","Affichage")
 ))
 
-
+#Corps du dashboard avec les graphes et les values box
 body<-dashboardBody(
+  #creation des pages suivant les differents menuItem
   tabItems(
     tabItem(tabName = "sitj",
-    fluidRow(
+    fluidPage(
 
-  # Application title
+
   titlePanel("Old Faithful Geyser Data"),
 
     mainPanel(
@@ -47,12 +50,12 @@ body<-dashboardBody(
 
 
 
-
+#Mise en page du dashboard
 dashboardPage(
   header,
   sidebar,
   body,
-  skin = "green"
+  skin = "green-light"
 )
-# Define UI for application that draws a histogram
+
 
