@@ -33,11 +33,12 @@ body<-dashboardBody(
     mainPanel(
       plotlyOutput("distPlot")
     )
-
+    #actionButton de telechargement a ajouter soit sur le main panel soit side panel
 )),
     tabItem(
       tabName = "hist",
       h2("Widgets tab content")
+      #actionButton de telechargement a ajouter soit sur le main panel soit side panel
 
     )
 

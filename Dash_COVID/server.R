@@ -15,7 +15,7 @@ shinyServer(function(input, output) {
 
     output$distPlot <- renderPlotly({
 
-       ggplotly( ggplot()+geom_histogram(mapping = aes(x), data=faithful, bins = aff(), color="blue", fill="orange"))
+       ggplotly( ggplot()+geom_histogram(mapping = aes(x), data=faithful, bins = aff(), color="cyan", fill="orange"))
     })
 
 })
