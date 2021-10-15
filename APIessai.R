@@ -7,3 +7,8 @@ donneebr<-GET(ap)
 rawToChar(donneebr$content)
 liste<-fromJSON(rawToChar(donneebr$content)) #On obtient la liste des infos par dep pour une date précise
 names(liste)
+
+
+apdep<-"https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=Rhône"
+donneedep<-GET(apdep)
+listedep<-fromJSON(rawToChar(donneedep$content))
