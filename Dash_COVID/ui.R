@@ -35,7 +35,10 @@ body<-dashboardBody(
   titlePanel("Old Faithful Geyser Data"),
 
     mainPanel(
-      plotlyOutput("distPlot")
+      plotlyOutput("distPlot"),
+      fluidRow( valueBoxOutput("mea"),
+                valueBoxOutput("mea2")
+      )
     )
     #actionButton de telechargement a ajouter soit sur le main panel soit side panel
 )),
@@ -43,6 +46,7 @@ body<-dashboardBody(
       tabName = "hist",
       h2("Widgets tab content"),
       sidebarPanel(  dateInput("jd","Selectionner le jour de depart",min = "2019-01-01",value = "2020-01-01",weekstart = 1, language = "fr"),
+                     downloadButton("tel")
       ),
       mainPanel(
         plotlyOutput("distPlot2")

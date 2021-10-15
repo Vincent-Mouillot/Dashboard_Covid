@@ -24,4 +24,12 @@ shinyServer(function(input, output) {
 
       ggplotly( ggplot()+geom_histogram(mapping = aes(x), data=faithful, bins = aff(), color="cyan", fill="orange"))
     })
+
+    output$mea<-renderValueBox({
+      valueBox( round(mean(x)), subtitle = "Moyenne")
+    })
+
+    output$mea2<-renderValueBox({
+      valueBox( round(mean(x)), subtitle = "Moyenne", color = "black")
+    })
 })
