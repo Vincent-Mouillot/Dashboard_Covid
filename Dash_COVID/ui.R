@@ -5,6 +5,7 @@ library(plotly)
 library(httr)
 library(jsonlite)
 
+#Pour les inputs voir les donnees dans l'api par ex graphe historique contamination par jour et contamination cumulees etc..
 
 #Header bar of the dashboard (ie le titre du projet)
 header<-dashboardHeader(title = "Dashboard sur les données du COVID", titleWidth = 380)
@@ -17,9 +18,10 @@ sidebar<-dashboardSidebar(sidebarMenu(
               min = 1,
               max = 50,
               value = 30),
-  menuItem("Situation un jour donné", tabName = "sitj", icon = icon("chart-bar")),
-  menuItem("Historique", tabName = "hist", icon = icon("th")),
-  actionButton("bout","Affichage")
+  dateInput("jj","Selectionner le jour",min = "2019-01-01",weekstart = 1, language = "fr"), #changer jour min pour mettre 1er jour contamination
+  actionButton("bout","Affichage"),
+  menuItem("Situation un jour donné", tabName = "sitj", icon = icon("head-side-virus")),
+  menuItem("Historique", tabName = "hist", icon = icon("grunt"))
 ))
 
 #Corps du dashboard avec les graphes et les values box
@@ -33,13 +35,19 @@ body<-dashboardBody(
   titlePanel("Old Faithful Geyser Data"),
 
     mainPanel(
-      plotlyOutput("distPlot")
+      plotlyOutput("distPlot"),
+      fluidRow( valueBoxOutput("mea"),
+                valueBoxOutput("mea2")
+      )
     )
     #actionButton de telechargement a ajouter soit sur le main panel soit side panel
 )),
     tabItem(
       tabName = "hist",
       h2("Widgets tab content"),
+      sidebarPanel(  dateInput("jd","Selectionner le jour de depart",min = "2019-01-01",value = "2020-01-01",weekstart = 1, language = "fr"),
+                     downloadButton("tel")
+      ),
       mainPanel(
         plotlyOutput("distPlot2")
       )
@@ -61,7 +69,7 @@ dashboardPage(
   header,
   sidebar,
   body,
-  skin = "green-light"
+  skin = "green"
 )
 
 
