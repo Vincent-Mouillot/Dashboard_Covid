@@ -2,6 +2,8 @@ library(shiny)
 library(shinydashboard)
 library(shinydashboardPlus)
 library(plotly)
+library(httr)
+library(jsonlite)
 
 
 #Header bar of the dashboard (ie le titre du projet)
@@ -37,7 +39,10 @@ body<-dashboardBody(
 )),
     tabItem(
       tabName = "hist",
-      h2("Widgets tab content")
+      h2("Widgets tab content"),
+      mainPanel(
+        plotlyOutput("distPlot2")
+      )
       #actionButton de telechargement a ajouter soit sur le main panel soit side panel
 
     )

@@ -2,6 +2,8 @@ library(shiny)
 library(shinydashboard)
 library(shinydashboardPlus)
 library(plotly)
+library(httr)
+library(jsonlite)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -18,4 +20,8 @@ shinyServer(function(input, output) {
        ggplotly( ggplot()+geom_histogram(mapping = aes(x), data=faithful, bins = aff(), color="cyan", fill="orange"))
     })
 
+    output$distPlot2 <- renderPlotly({
+
+      ggplotly( ggplot()+geom_histogram(mapping = aes(x), data=faithful, bins = aff(), color="cyan", fill="orange"))
+    })
 })
