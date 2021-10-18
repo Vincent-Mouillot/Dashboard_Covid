@@ -1,7 +1,6 @@
 library(httr)
 library(rjson)
 
-
 #ap<-"https://coronavirusapi-france.now.sh/AllDataByDate?date=2020-04-19"
 #ceci permet d'obtenir les valeurs pour 19 avril 2020
 
@@ -16,6 +15,16 @@ names(liste_date) #devrait obtenir "code, nom, date, hospitalisation, reanimatio
 
 
 
-apdep<-"https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=Rhône"
+ap<-"https://coronavirusapi-france.now.sh/AllDataByDate?date=2020-04-19"
+donneebr<-GET(ap)
+rawToChar(donneebr$content)
+liste<-fromJSON(rawToChar(donneebr$content)) #On obtient la liste des infos par dep pour une date précise
+
+
+hos<-liste$allFranceDataByDate%>%sapply("[",4)%>%as.data.frame()%>%sum()
+
+dep<-"Rhône"
+apdep<-paste("https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=Rhône", dep)
 donneedep<-GET(apdep)
 listedep<-fromJSON(rawToChar(donneedep$content))
+df_bydep<-listedep$allDataByDepartement %>% sapply("[", 4) %>% as.data.frame() %>% sum()
