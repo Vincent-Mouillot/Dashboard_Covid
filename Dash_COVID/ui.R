@@ -28,21 +28,21 @@ body<-dashboardBody(
     fluidPage(
 
 
-  titlePanel("Données du jour"),
+  titlePanel("Données du jour"), #ajouter date reactive au titre
 
     mainPanel( #3lignes de deux values box
-      h2("Widgets tab content"),
+      h2("Widgets tab content"), #changer titre
       fluidRow(
         valueBoxOutput("hosp"),
         valueBoxOutput("rea")
 
       ),
-      h2("Widgets tab content"),
+      h2("Widgets tab content"), #changer titre
       fluidRow(
         valueBoxOutput("nhosp"),
         valueBoxOutput("nrea")
       ),
-      h2("Widgets tab content"),
+      h2("Widgets tab content"), #changer titre
       fluidRow(
         valueBoxOutput("de"),
         valueBoxOutput("gu")
