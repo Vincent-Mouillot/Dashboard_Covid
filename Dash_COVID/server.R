@@ -4,32 +4,49 @@ library(shinydashboardPlus)
 library(plotly)
 library(httr)
 library(jsonlite)
+library(dplyr)
 
-# Define server logic required to draw a histogram
 shinyServer(function(input, output) {
 
-    x  <- faithful[, 2]
+    sumna<-function(x){
+      sum(x,na.rm = TRUE)
+    }
 
-    aff<- eventReactive(input$bout, {
+    donn<- eventReactive(input$bout, {
+      ap<-paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=",as.character(input$jj),sep = "")
+      donneebr<-GET(ap)
+      lis<-fromJSON(rawToChar(donneebr$content)) #On obtient la liste des infos par dep pour une date précis
+      dat<-lis$allFranceDataByDate[,c(4:9)]
+      glimpse(dat)
+      apply(dat,2,sumna)
 
-      input$bins
     })
 
-    output$distPlot <- renderPlotly({
 
-       ggplotly( ggplot()+geom_histogram(mapping = aes(x), data=faithful, bins = aff(), color="cyan", fill="orange"))
+
+    output$hosp<-renderValueBox({
+      valueBox( donn()[1], subtitle = "Hosp")
     })
 
-    output$distPlot2 <- renderPlotly({
-
-      ggplotly( ggplot()+geom_histogram(mapping = aes(x), data=faithful, bins = aff(), color="cyan", fill="orange"))
+    output$rea<-renderValueBox({
+      valueBox( donn()[2], subtitle = "Rea")
     })
 
-    output$mea<-renderValueBox({
-      valueBox( round(mean(x)), subtitle = "Moyenne")
+    output$nhosp<-renderValueBox({
+      valueBox( donn()[3], subtitle = "Nvle Hosp")
     })
 
-    output$mea2<-renderValueBox({
-      valueBox( round(mean(x)), subtitle = "Moyenne", color = "black")
+    output$nrea<-renderValueBox({
+      valueBox( donn()[4], subtitle = "Nvle Rea")
     })
+
+    output$de<-renderValueBox({
+      valueBox( donn()[5], subtitle = "Deces")
+    })
+
+    output$gu<-renderValueBox({
+      valueBox( donn()[6], subtitle = "Guerison")
+    })
+
+
 })
