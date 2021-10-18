@@ -5,6 +5,9 @@ library(plotly)
 library(httr)
 library(jsonlite)
 library(dplyr)
+library(RColorBrewer)
+library(colorspace)
+library(colorscience)
 
 shinyServer(function(input, output) {
 
@@ -12,7 +15,7 @@ shinyServer(function(input, output) {
       sum(x,na.rm = TRUE)
     }
 
-    donn<- eventReactive(input$bout, {
+    donn<- eventReactive(input$bout, { #recuperation donnees mise en forme vector de somme
       ap<-paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=",as.character(input$jj),sep = "")
       donneebr<-GET(ap)
       lis<-fromJSON(rawToChar(donneebr$content)) #On obtient la liste des infos par dep pour une date précis

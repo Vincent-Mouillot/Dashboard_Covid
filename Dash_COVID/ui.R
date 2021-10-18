@@ -14,7 +14,7 @@ header<-dashboardHeader(title = "Dashboard sur les données du COVID", titleWidt
 
 #Menu depliant avec les deux onglets et les inputs du departement etc...
 sidebar<-dashboardSidebar(sidebarMenu(
-  dateInput("jj","Selectionner le jour",min = "2019-01-01",value = "2021-08-12" ,weekstart = 1, language = "fr"), #changer jour min pour mettre 1er jour contamination
+  dateInput("jj","Selectionner le jour",min = "2019-01-01",max = "2021-08-12",value = "2021-08-12" ,weekstart = 1, language = "fr"), #changer jour min pour mettre 1er jour contamination
   actionButton("bout","Affichage"),
   menuItem("Situation un jour donné", tabName = "sitj", icon = icon("head-side-virus")),
   menuItem("Historique", tabName = "hist", icon = icon("grunt"))
