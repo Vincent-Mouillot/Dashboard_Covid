@@ -48,4 +48,32 @@ shinyServer(function(input, output) {
   output$gu <- renderValueBox({
     valueBox(donn()[6], subtitle = "Guerison")
   })
+
+
+
+  #####Deuxieme onglet pour chaque dep
+  sel<-function(x){
+    s<-x %>% as.data.frame() %>% select_if(is.numeric)
+    s
+  }
+
+  sel_date<-function(x){
+    s<-x %>% as.data.frame() %>% select(date)
+    s
+  }
+
+  mef_don<-function(x){  #a mettre en reactive dans serveur en ajoutant sel et sel_date
+    don<-x %>% sapply(sel)
+    dat<-x %>% sapply(sel_date)
+
+    don<-t(don[-c(1:34)]) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t()
+    dat<-((da[-c(1:34)]))
+    #les 33 premieres lignes sont pourries et pas standardisees
+    #a partir de la ligne 34 toutes les lignes ont la meme forme donc plus simple
+    donnee<-data.frame(don,row.names = dat)
+    donnee #df de 6  col et +500 lignes avec date en nom de ligne
+  }
+
+  #filtre des donnees en fction des dates donnees
+  #ajouter ggplot avec donnees
 })

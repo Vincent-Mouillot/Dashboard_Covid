@@ -58,6 +58,7 @@ body <- dashboardBody(
       ),
       mainPanel()
       # actionButton de telechargement a ajouter soit sur le main panel soit side panel
+      #ajouter input ggplot et input choix dep
     )
   )
 )

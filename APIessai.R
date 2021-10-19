@@ -58,6 +58,7 @@ head(dd)
 dd[c(1:50)]
 
 da<-listedep$allDataByDepartement %>% sapply(sel_date)
+da %>% sapply("[") %>% t()
 
 t(as.data.frame(da[-c(1:34)]))
 
@@ -67,15 +68,16 @@ t(df) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t()
 
 cbind(t(as.data.frame(da[-c(1:34)])),t(df) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t())
 
-mef_don<-function(x){
+mef_don<-function(x){  #a mettre en reactive dans serveur en ajoutant sel et sel_date
   don<-x %>% sapply(sel)
   dat<-x %>% sapply(sel_date)
 
   don<-t(don[-c(1:34)]) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t()
-  dat<-t(as.data.frame(da[-c(1:34)]))
-  donnee<-cbind(dat,don)
-  donnee<-as.data.frame(donnee)
-
+  dat<-((da[-c(1:34)]))
+  #les 33 premieres lignes sont pourries et pas standardisees
+  #a partir de la ligne 34 toutes les lignes ont la meme forme donc plus simple
+  donnee<-data.frame(don,row.names = dat)
+  donnee
 }
 
 mef_don(listedep$allDataByDepartement)
