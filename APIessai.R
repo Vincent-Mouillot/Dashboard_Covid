@@ -33,11 +33,50 @@ liste$allFranceDataByDate[4]%>%unlist()
 liste$allFranceDataByDate$hospitalises[4]
 
 liste$allFranceDataByDate[4,4]
+paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=","2020-04-19",sep = "")
+
+as.character.Date(date())
+
 
 apdep<-"https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=Rhône"
 donneedep<-GET(apdep)
 listedep<-fromJSON(rawToChar(donneedep$content))
 
-paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=","2020-04-19",sep = "")
 
-as.character.Date(date())
+sel<-function(x){
+  s<-x %>% as.data.frame() %>% select_if(is.numeric)
+  s
+}
+
+sel_date<-function(x){
+  s<-x %>% as.data.frame() %>% select(date)
+  s
+}
+
+dd<-listedep$allDataByDepartement %>% sapply(sel)
+head(dd)
+dd[c(1:50)]
+
+da<-listedep$allDataByDepartement %>% sapply(sel_date)
+
+t(as.data.frame(da[-c(1:34)]))
+
+df<-dd[-c(1:34)]
+head(df)
+t(df) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t()
+
+cbind(t(as.data.frame(da[-c(1:34)])),t(df) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t())
+
+mef_don<-function(x){
+  don<-x %>% sapply(sel)
+  dat<-x %>% sapply(sel_date)
+
+  don<-t(don[-c(1:34)]) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t()
+  dat<-t(as.data.frame(da[-c(1:34)]))
+  donnee<-cbind(dat,don)
+  donnee<-as.data.frame(donnee)
+
+}
+
+mef_don(listedep$allDataByDepartement)
+is.data.frame(data)
