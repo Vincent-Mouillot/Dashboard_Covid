@@ -66,10 +66,14 @@ shinyServer(function(input, output) {
   }
 
   mef_don<-function(x,date_depart,date_fin){  #a mettre en reactive dans serveur en ajoutant sel et sel_date
+    glimpse(x)
     don<-x %>% sapply(sel)
+    glimpse(don)
     dat<-x %>% sapply(sel_date)
+    glimpse(dat)
 
     don<-t(don[-c(1:34)]) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t()
+    glimpse(don)
     cname<-colnames(don)
     don<-unlist(don)
     dat<-((da[-c(1:34)]))
