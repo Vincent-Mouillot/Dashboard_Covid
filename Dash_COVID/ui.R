@@ -34,7 +34,7 @@ body <- dashboardBody(
         mainPanel( # 3lignes de deux values box
           h2("Widgets tab content"),
           fluidRow(
-            valueBoxOutput("hosp"),
+            valueBoxOutput("hosp"), #CHANGER les noms
             valueBoxOutput("rea")
           ),
           h2("Widgets tab content"),
