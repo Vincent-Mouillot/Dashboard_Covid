@@ -14,8 +14,6 @@ header <- dashboardHeader(title = "Dashboard sur les données du COVID", titleWi
 
 # Menu depliant avec les deux onglets et les inputs du departement etc...
 sidebar <- dashboardSidebar(sidebarMenu(
-  dateInput("jj", "Selectionner le jour", min = "2019-01-01", max = "2021-08-12", value = "2021-08-12", weekstart = 1, language = "fr"), # changer jour min pour mettre 1er jour contamination
-  actionButton("bout", "Affichage"),
   menuItem("Situation un jour donné", tabName = "sitj", icon = icon("head-side-virus")),
   menuItem("Historique", tabName = "hist", icon = icon("grunt"))
 ))
@@ -28,6 +26,11 @@ body <- dashboardBody(
       tabName = "sitj",
       fluidPage(
         titlePanel("Données du jour"),
+        sidebarPanel(
+          dateInput("jj", "Selectionner le jour", min = "2019-01-01", max = "2021-08-12", value = "2021-08-12", weekstart = 1, language = "fr"), # changer jour min pour mettre 1er jour contamination
+          actionButton("bout", "Affichage"),
+          width = 2
+        ),
         mainPanel( # 3lignes de deux values box
           h2("Widgets tab content"),
           fluidRow(
@@ -53,8 +56,9 @@ body <- dashboardBody(
       tabName = "hist",
       h2("Widgets tab content"),
       sidebarPanel(
-        dateInput("jd", "Selectionner le jour de depart", min = "2019-01-01", value = "2020-01-01", weekstart = 1, language = "fr"),
-        downloadButton("tel")
+        dateRangeInput("range", "Selectionner la periode", min = "2020-03-28", max = "2021-08-12", start = "2020-03-28", end = "2021-08-12", weekstart = 1, language = "fr", separator = "au"),
+        downloadButton("tel"),
+        width = 2
       ),
       mainPanel()
       # actionButton de telechargement a ajouter soit sur le main panel soit side panel
