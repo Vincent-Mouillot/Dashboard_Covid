@@ -24,16 +24,15 @@ shinyServer(function(input, output) {
     donneebr <- GET(ap)
     lis <- fromJSON(rawToChar(donneebr$content))
     # On obtient la liste des infos par dep pour une date précis
-    dat <- lis$allFranceDataByDate[, c(2,4:9)]
+    dat <- lis$allFranceDataByDate[, c(1,2,4:9)]
     dat<-dat %>% as.data.frame()
+    dat <- dat %>% filter (code <= "DEP-976"| code =="FRA")
+    dat<-dat[,-1]
     dat<- dat %>% filter(nom == input$loc)
+
     #glimpse(dat)
-    #apply(dat, 2, sumna) #non besoin , France est dans les individus (pour Vincent)(ou pas à boir)
+    #apply(dat, 2, sumna) #non besoin , France est dans les individus (pour Vincent)
   })
-
-
-
-
 
   output$hosp <- renderValueBox({
     valueBox(donn()[2], subtitle = "Hosp")
