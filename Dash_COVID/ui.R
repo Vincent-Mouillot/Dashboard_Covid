@@ -28,13 +28,13 @@ body <- dashboardBody(
         titlePanel("Données du jour"),
         sidebarPanel(
           dateInput("jj", "Selectionner le jour", min = "2019-01-01", max = "2021-08-12", value = "2021-08-12", weekstart = 1, language = "fr"), # changer jour min pour mettre 1er jour contamination
-          actionButton("bout", "Affichage"),
+          actionButton("bout", "Affichage"), #changer le min et mettre max=today
           width = 2
         ),
         mainPanel( # 3lignes de deux values box
           h2("Widgets tab content"),
           fluidRow(
-            valueBoxOutput("hosp"),
+            valueBoxOutput("hosp"), #CHANGER les noms
             valueBoxOutput("rea")
           ),
           h2("Widgets tab content"),
