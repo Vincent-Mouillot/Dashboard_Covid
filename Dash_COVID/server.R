@@ -104,7 +104,7 @@ shinyServer(function(input, output) {
 
     selectInput("departe",
                 "Choisir dep",
-                choices = c("France",li_dep)
+                choices = c("France",li_dep) #pb avec France
                 )
   })
 
