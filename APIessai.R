@@ -157,7 +157,7 @@ class(cg)
 
 
 apdep<-paste("https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
-             as.character("Jura"), #changer avec input mais recup liste dep avant
+             as.character("Eure"), #changer avec input mais recup liste dep avant
              sep = "")
 donneedep<-GET(apdep)
 listedep<-fromJSON(rawToChar(donneedep$content))
@@ -166,7 +166,7 @@ glimpse(listedep$allDataByDepartement)
 
 
 mef_don_dep<-function(x,date_depart,date_fin){
-  x<-x[-c(1:34),] %>% as.data.frame() %>% select(date,
+  x<-x %>% as.data.frame() %>% filter(sourceType == "sante-publique-france-data") %>% select(date,
                                                  hospitalises,
                                                  reanimation,
                                                  deces,
@@ -181,7 +181,7 @@ mef_don_dep<-function(x,date_depart,date_fin){
   d
 }
 
-ess<-mef_don_dep(listedep$allDataByDepartement,"2020-03-28","2021-08-12")
+ess<-mef_don_dep(listedep$allDataByDepartement,"2020-03-12","2021-08-12")
 as.Date(rownames(ess))
 
 listedep$allDataByDepartement %>% select(deces)

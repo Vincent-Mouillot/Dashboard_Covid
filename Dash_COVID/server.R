@@ -20,7 +20,11 @@ shinyServer(function(input, output) {
     listede<-GET(ldep)
     listede<-fromJSON(rawToChar(listede$content))
 
-    listede<-listede %>% apply(2,replace_acc) %>% as.data.frame() %>% select(nom)
+    listede<-listede %>%
+      apply(2,replace_acc) %>%
+      as.data.frame() %>%
+      select(nom) %>%
+      arrange(nom)
     listede[,1]
   }
 
@@ -73,13 +77,15 @@ shinyServer(function(input, output) {
 
   #####Deuxieme onglet pour chaque dep
   mef_don_dep<-function(x,date_depart,date_fin){
-    x<-x[-c(1:34),] %>% select(date,
-                               hospitalises,
-                               reanimation,
-                               deces,
-                               gueris,
-                               nouvellesHospitalisations,
-                               nouvellesReanimations)
+    x<-x %>%
+      filter(sourceType == "sante-publique-france-data") %>%
+      select(date,
+             hospitalises,
+             reanimation,
+             deces,
+             gueris,
+             nouvellesHospitalisations,
+             nouvellesReanimations)
     donnee<-x %>%
             data.frame(row.names = x$date) %>%
             select(-date)
@@ -98,7 +104,7 @@ shinyServer(function(input, output) {
 
     selectInput("departe",
                 "Choisir dep",
-                choices = li_dep
+                choices = c("France",li_dep)
                 )
   })
 
