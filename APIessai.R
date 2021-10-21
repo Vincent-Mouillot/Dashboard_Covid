@@ -38,10 +38,12 @@ paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=","2020-04-19",se
 as.character.Date(date())
 
 
-apdep<-"https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=Rhône"
+apdep<-paste("https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
+             as.character("Rhône"), #changer avec input mais recup liste dep avant
+             sep = "")
 donneedep<-GET(apdep)
 listedep<-fromJSON(rawToChar(donneedep$content))
-
+glimpse(listedep$allDataByDepartement)
 
 sel<-function(x){
   s<-x %>% as.data.frame() %>% select_if(is.numeric)
@@ -124,3 +126,18 @@ try<-mef_don2(listedep$allDataByDepartement,"2020-03-28","2021-08-12")
 x<-listedep$allDataByDepartement
 date_depart<-"2020-03-29"
 date_fin<-"2020-04-01"
+
+
+mef_don_dep<-function(x,date_depart,date_fin){
+  x<-x[-c(1:34),c(1,10,8,7,11,12,13)]
+  donnee<-x %>% data.frame(row.names = x$date) %>% select(-date)
+
+  seqD<-seq.Date(from=as.Date(date_depart),to=as.Date(date_fin),by=1)
+  d<-donnee[c(as.character( seqD)),]
+  glimpse(d)
+  d
+}
+
+ess<-mef_don_dep(listedep$allDataByDepartement,"2020-03-28","2021-08-12")
+cg<-as.Date(rownames(ess))
+class(cg)

@@ -16,8 +16,10 @@ shinyServer(function(input, output) {
 
   donn <- eventReactive(input$bout, {
     # recuperation donnees mise en forme vector de somme
-    ap <- paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=",
-                as.character(input$jj), sep = "")
+    ap <- paste(
+            "https://coronavirusapi-france.now.sh/AllDataByDate?date=",
+            as.character(input$jj),
+            sep = "")
     donneebr <- GET(ap)
     lis <- fromJSON(rawToChar(donneebr$content))
     # On obtient la liste des infos par dep pour une date précis
@@ -55,56 +57,82 @@ shinyServer(function(input, output) {
 
 
   #####Deuxieme onglet pour chaque dep
-  sel<-function(x){
-    s<-x %>% as.data.frame() %>% select_if(is.numeric)
-    s
-  }
+  mef_don_dep<-function(x,date_depart,date_fin){
+    x<-x[-c(1:34),c(1,10,8,7,11,12,13)]
+    donnee<-x %>%
+            data.frame(row.names = x$date) %>%
+            select(-date)
 
-  sel_date<-function(x){
-    s<-x %>% as.data.frame() %>% select(date)
-    s
-  }
-
-  mef_don<-function(x,date_depart,date_fin){  #a mettre en reactive dans serveur en ajoutant sel et sel_date
-    glimpse(x)
-    don<-x %>% sapply(sel)
-    glimpse(don)
-    dat<-x %>% sapply(sel_date)
-    glimpse(dat)
-
-    don<-t(don[-c(1:34)]) %>% sapply("[",c(1:6)) %>% as.data.frame() %>% t()
-    glimpse(don)
-    cname<-colnames(don)
-    don<-unlist(don)
-    dat<-((da[-c(1:34)]))
-    #les 33 premieres lignes sont pourries et pas standardisees
-    #a partir de la ligne 34 toutes les lignes ont la meme forme donc plus simple
-    donnee<-don %>% matrix(ncol = 6) %>% data.frame(row.names = dat)
-    colnames(donnee)<- cname
-
-    seqD<-seq.Date(from=as.Date(date_depart),to=as.Date(date_fin),by=1)
+    seqD<-seq.Date(from=as.Date(date_depart),
+                   to=as.Date(date_fin),
+                   by=1)
     d<-donnee[c(as.character( seqD)),]
-    glimpse(d)
+
     d
   }
 
   donn_dep<- eventReactive(input$boutrange, {
-
-    apdep<-paste("https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
-                 as.character("Rhône"), #changer avec input mais recup liste dep avant
-                 sep = "")
+    apdep<-paste(
+      "https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
+      as.character("Rhône"), #changer avec input mais recup liste dep avant
+      sep = "")
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
-
-    don<-mef_don(donneedep$allDataByDepartement,boutrange[1],boutrange[2])
-
+    don<-mef_don_dep(donneedep$allDataByDepartement,
+                     input$range[1],
+                     input$range[2])
+    glimpse(don)
     don
   })
 
 
 
-  output$graph<- renderPlot(ggplot(data = donn_dep()) +
-                              geom_point(mapping = aes(x = seq(1:nrow(donn_dep())))))
-  #filtre des donnees en fction des dates donnees
-  #ajouter ggplot avec donnees
+  output$graph_sit<- renderPlotly(
+    ggplotly(
+      ggplot(data = donn_dep(),
+             aes(x = as.Date(rownames(donn_dep())))) +
+          geom_line(mapping = aes(y=hospitalises,
+                                  colour = "hosp")) +
+          geom_line(mapping = aes(y=reanimation,
+                                  colour = "rea" )) +
+          scale_colour_manual("",
+                              breaks = c("hosp","rea"),
+                              values = c("blue", "orange")) +
+          xlab("Date") +
+          ylab("Nombre de personne") +
+          labs(title = "Situation hopitaux jour par jour")
+    ) )
+
+  output$graph_cumul<- renderPlotly(
+    ggplotly(
+      ggplot(data = donn_dep(),
+             aes(x = as.Date(rownames(donn_dep())))) +
+          geom_line(mapping = aes(y=deces,
+                                  colour = "deces")) +
+          geom_line(mapping = aes(y=gueris,
+                                  colour = "gueris" )) +
+          scale_colour_manual("",
+                              breaks = c("deces","gueris"),
+                              values = c("blue", "orange")) +
+          xlab("Date") +
+          ylab("Nombre de personne") +
+          labs(title = "Cumul décès et guérison")
+  ) )
+
+  output$graph_nvx<- renderPlotly(
+    ggplotly(
+      ggplot(data = donn_dep(),
+             aes(x = as.Date(rownames(donn_dep())))) +
+          geom_line(mapping = aes(y=nouvellesHospitalisations,
+                                  colour = "nvlleh")) +
+          geom_line(mapping = aes(y=nouvellesReanimations,
+                                  colour = "nvller" )) +
+          scale_colour_manual("",
+                              breaks = c("nvlleh","nvller"),
+                              values = c("blue", "orange")) +
+          xlab("Date") +
+          ylab("Nombre de personne") +
+          labs(title = "Arrivée en hopital")
+  ) )
+
 })
