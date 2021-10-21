@@ -31,7 +31,7 @@ body <- dashboardBody(
            #changer le min et mettre max=today
           width = 3,
           selectInput("loc", "Choisissez la localisation souhaitée",
-                      choices = levels(as.factor(dat[,1])),
+                      choices = levels(as.factor(dat[c(1:101,103),1])),
                       selected = "France"
           ),
           actionButton("bout", "Affichage")

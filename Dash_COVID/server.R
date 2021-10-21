@@ -9,10 +9,24 @@ library(RColorBrewer)
 library(colorspace)
 library(colorscience)
 library(tibble)
+library(stringr)
 
 shinyServer(function(input, output) {
   sumna <- function(x) {
     sum(x, na.rm = TRUE)
+  }
+
+#  clean_name <- function(name){
+    name<-str_replace_all(string = name, pattern = "Ã¨", replacement = "e")
+    name<-str_replace_all(string=name, pattern="ã©", replacement = "e")
+    name<-str_replace_all(string = name, pattern= "[âà]+", replacement ="a")
+    name<-str_replace_all(string = name, pattern= "[ùû]+", replacement="u")
+    name<-str_replace_all(string = name, pattern="e´", replacement="o")
+    name<-str_replace_all(string = name, pattern="Ež", replacement="i")
+    name<-str_replace_all(string =name, pattern = "[ ]+", replacement = "")
+    name<-str_to_lower(name)
+    name<-str_to_title(name)
+    name
   }
 
 
@@ -26,7 +40,7 @@ shinyServer(function(input, output) {
     # On obtient la liste des infos par dep pour une date précis
     dat <- lis$allFranceDataByDate[, c(1,2,4:9)]
     dat<-dat %>% as.data.frame()
-    dat <- dat %>% filter (code <= "DEP-976"| code =="FRA")
+    #dat <- dat %>% filter (code <= "DEP-976"| code =="FRA" )
     dat<-dat[,-1]
     dat<- dat %>% filter(nom == input$loc)
 
@@ -40,23 +54,23 @@ shinyServer(function(input, output) {
 
 
   output$rea <- renderValueBox({
-    valueBox(donn()[,3], subtitle = "Rea")
+    valueBox(donn()[3], subtitle = "Rea")
   })
 
   output$nhosp <- renderValueBox({
-    valueBox(donn()[,4], subtitle = "Nvle Hosp")
+    valueBox(donn()[4], subtitle = "Nvle Hosp")
   })
 
   output$nrea <- renderValueBox({
-    valueBox(donn()[,5], subtitle = "Nvle Rea")
+    valueBox(donn()[5], subtitle = "Nvle Rea")
   })
 
   output$de <- renderValueBox({
-    valueBox(donn()[5], subtitle = "Deces")
+    valueBox(donn()[6], subtitle = "Deces")
   })
 
   output$gu <- renderValueBox({
-    valueBox(donn()[6], subtitle = "Guerison")
+    valueBox(donn()[7], subtitle = "Guerison")
   })
 
 
