@@ -38,6 +38,7 @@ shinyServer(function(input, output) {
     valueBox(donn()[2], subtitle = "Hosp")
   })
 
+
   output$rea <- renderValueBox({
     valueBox(donn()[,3], subtitle = "Rea")
   })
