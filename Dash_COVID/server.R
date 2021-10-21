@@ -16,19 +16,19 @@ shinyServer(function(input, output) {
     sum(x, na.rm = TRUE)
   }
 
-#  clean_name <- function(name){
-    name<-str_replace_all(string = name, pattern = "Ã¨", replacement = "e")
-    name<-str_replace_all(string=name, pattern="ã©", replacement = "e")
-    name<-str_replace_all(string = name, pattern= "[âà]+", replacement ="a")
-    name<-str_replace_all(string = name, pattern= "[ùû]+", replacement="u")
-    name<-str_replace_all(string = name, pattern="e´", replacement="o")
-    name<-str_replace_all(string = name, pattern="Ež", replacement="i")
-    name<-str_replace_all(string =name, pattern = "[ ]+", replacement = "")
-    name<-str_to_lower(name)
-    name<-str_to_title(name)
-    name
+  #####Recupération liste dep
+  clean_name<-function(x){
+    str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
   }
 
+  liste_departement<-function(){
+    ldep<-"https://geo.api.gouv.fr/departements"
+    listede<-GET(ldep)
+    listede<-fromJSON(rawToChar(listede$content))
+
+    listede<-listede %>% apply(2,clean_name) %>% as.data.frame() %>% select(nom)
+    listede[,1]
+  }
 
 
   donn <- eventReactive(input$bout, {
@@ -40,8 +40,8 @@ shinyServer(function(input, output) {
     # On obtient la liste des infos par dep pour une date précis
     dat <- lis$allFranceDataByDate[, c(1,2,4:9)]
     dat<-dat %>% as.data.frame()
-    #dat <- dat %>% filter (code <= "DEP-976"| code =="FRA" )
-    dat<-dat[,-1]
+    liste<-dat %>% apply(2, clean_name) %>% as.data.frame() %>% select(nom)
+    dat<- cbind(liste, dat[,-c(1,2)])
     dat<- dat %>% filter(nom == input$loc)
 
     #glimpse(dat)
