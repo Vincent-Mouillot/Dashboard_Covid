@@ -70,9 +70,9 @@ body <- dashboardBody(
       sidebarPanel(
         dateRangeInput("range",
                        "Selectionner la periode",
-                       min = "2020-03-28",
+                       min = "2020-03-18",
                        max = "2021-08-12",
-                       start = "2020-03-28",
+                       start = "2020-03-18",
                        end = "2021-08-12",
                        weekstart = 1,
                        language = "fr",

@@ -27,6 +27,7 @@ shinyServer(function(input, output) {
       arrange(nom)
     listede[,1]
   }
+
     donnj<- eventReactive(input$bout, { #recuperation donnees mise en forme vector de somme
       ap<-paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=",as.character(input$jj),sep = "")
       donneebr<-GET(ap)
@@ -34,7 +35,7 @@ shinyServer(function(input, output) {
       dat<-lis$allFranceDataByDate[,c(4:9)]
       glimpse(dat)
       apply(dat,2,sumna)
-
+    })
   #####Premier onglet
   sumna <- function(x) {
     sum(x, na.rm = TRUE)
