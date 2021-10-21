@@ -7,6 +7,8 @@ library(jsonlite)
 library(dplyr)
 
 
+
+
 # Header bar of the dashboard (ie le titre du projet)
 header <- dashboardHeader(title = "Dashboard sur les données du COVID",
                           titleWidth = 380)
@@ -58,7 +60,7 @@ body <- dashboardBody(
             valueBoxOutput("gu")
           )
         )
-        # actionButton de telechargement a ajouter soit sur le side panel
+        # actionButton de telechargement a ajouter sur le side panel
         # possibilite d ajouter un choix pour la france ou un dep particulier
       )
     ),
@@ -75,7 +77,9 @@ body <- dashboardBody(
                        weekstart = 1,
                        language = "fr",
                        separator = "au"),
-        actionButton("boutrange", "Affichage"),
+        uiOutput("ddep"),
+        actionButton("boutrange",
+                     "Affichage"),
         downloadButton("tel"),
         width = 4
       ),

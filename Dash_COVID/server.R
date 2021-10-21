@@ -10,6 +10,21 @@ library(colorspace)
 library(colorscience)
 
 shinyServer(function(input, output) {
+  #####Recup liste dep
+  replace_acc<-function(x){
+    str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
+  }
+
+  liste_departement<-function(){
+    ldep<-"https://geo.api.gouv.fr/departements"
+    listede<-GET(ldep)
+    listede<-fromJSON(rawToChar(listede$content))
+
+    listede<-listede %>% apply(2,replace_acc) %>% as.data.frame() %>% select(nom)
+    listede[,1]
+  }
+
+  #####Premier onglet
   sumna <- function(x) {
     sum(x, na.rm = TRUE)
   }
@@ -58,7 +73,13 @@ shinyServer(function(input, output) {
 
   #####Deuxieme onglet pour chaque dep
   mef_don_dep<-function(x,date_depart,date_fin){
-    x<-x[-c(1:34),c(1,10,8,7,11,12,13)]
+    x<-x[-c(1:34),] %>% select(date,
+                               hospitalises,
+                               reanimation,
+                               deces,
+                               gueris,
+                               nouvellesHospitalisations,
+                               nouvellesReanimations)
     donnee<-x %>%
             data.frame(row.names = x$date) %>%
             select(-date)
@@ -71,13 +92,24 @@ shinyServer(function(input, output) {
     d
   }
 
+
+  output$ddep<-renderUI({
+    li_dep<-liste_departement()
+
+    selectInput("departe",
+                "Choisir dep",
+                choices = li_dep
+                )
+  })
+
   donn_dep<- eventReactive(input$boutrange, {
     apdep<-paste(
       "https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
-      as.character("Rhône"), #changer avec input mais recup liste dep avant
-      sep = "")
+      as.character(input$departe), #changer avec input mais recup liste dep avant
+      sep = "") #marche que pour le Rhone pour le moment
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
+    glimpse(donneedep$allDataByDepartement)
     don<-mef_don_dep(donneedep$allDataByDepartement,
                      input$range[1],
                      input$range[2])

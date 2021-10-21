@@ -39,7 +39,7 @@ as.character.Date(date())
 
 
 apdep<-paste("https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
-             as.character("Rhône"), #changer avec input mais recup liste dep avant
+             as.character("Jura"), #changer avec input mais recup liste dep avant
              sep = "")
 donneedep<-GET(apdep)
 listedep<-fromJSON(rawToChar(donneedep$content))
@@ -141,3 +141,48 @@ mef_don_dep<-function(x,date_depart,date_fin){
 ess<-mef_don_dep(listedep$allDataByDepartement,"2020-03-28","2021-08-12")
 cg<-as.Date(rownames(ess))
 class(cg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+apdep<-paste("https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
+             as.character("Jura"), #changer avec input mais recup liste dep avant
+             sep = "")
+donneedep<-GET(apdep)
+listedep<-fromJSON(rawToChar(donneedep$content))
+glimpse(listedep$allDataByDepartement)
+
+
+
+mef_don_dep<-function(x,date_depart,date_fin){
+  x<-x[-c(1:34),] %>% as.data.frame() %>% select(date,
+                                                 hospitalises,
+                                                 reanimation,
+                                                 deces,
+                                                 gueris,
+                                                 nouvellesHospitalisations,
+                                                 nouvellesReanimations)
+  donnee<-x %>% data.frame(row.names = x$date) %>% select(-date)
+
+  seqD<-seq.Date(from=as.Date(date_depart),to=as.Date(date_fin),by=1)
+  d<-donnee[c(as.character( seqD)),]
+  glimpse(d)
+  d
+}
+
+ess<-mef_don_dep(listedep$allDataByDepartement,"2020-03-28","2021-08-12")
+as.Date(rownames(ess))
+
+listedep$allDataByDepartement %>% select(deces)
+
