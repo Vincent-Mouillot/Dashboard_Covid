@@ -30,6 +30,15 @@ shinyServer(function(input, output) {
     listede[,1]
   }
 
+  output$loc<-renderUI({
+    li_dep<-liste_departement()
+
+    selectInput("loc",
+                "Choisir dep",
+                choices = c("France",li_dep) #pb avec France
+    )
+  })
+
 
   donn <- eventReactive(input$bout, {
     # recuperation donnees mise en forme vector de somme
