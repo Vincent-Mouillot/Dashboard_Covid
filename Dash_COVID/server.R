@@ -30,31 +30,9 @@ shinyServer(function(input, output) {
     listede[,1]
   }
 
-    donnj<- eventReactive(input$bout, { #recuperation donnees mise en forme vector de somme
-      ap<-paste("https://coronavirusapi-france.now.sh/AllDataByDate?date=",as.character(input$jj),sep = "")
-      donneebr<-GET(ap)
-      lis<-fromJSON(rawToChar(donneebr$content)) #On obtient la liste des infos par dep pour une date précis
-      dat<-lis$allFranceDataByDate[,c(4:9)]
-      glimpse(dat)
-      apply(dat,2,sumna)
-    })
   #####Premier onglet
   sumna <- function(x) {
     sum(x, na.rm = TRUE)
-  }
-
-  #####Recupération liste dep
-  clean_name<-function(x){
-    str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
-  }
-
-  liste_departement<-function(){
-    ldep<-"https://geo.api.gouv.fr/departements"
-    listede<-GET(ldep)
-    listede<-fromJSON(rawToChar(listede$content))
-
-    listede<-listede %>% apply(2,clean_name) %>% as.data.frame() %>% select(nom)
-    listede[,1]
   }
 
   output$loc<-renderUI({
@@ -76,14 +54,22 @@ shinyServer(function(input, output) {
     donneebr <- GET(ap)
     lis <- fromJSON(rawToChar(donneebr$content))
     # On obtient la liste des infos par dep pour une date précis
-    dat <- lis$allFranceDataByDate[, c(1,2,4:9)]
+    #dat <- lis$allFranceDataByDate[, c(2,4:9)]
+    dat <- lis$allFranceDataByDate %>% select(nom,
+                                              hospitalises,
+                                              reanimation,
+                                              nouvellesHospitalisations,
+                                              nouvellesReanimations,
+                                              deces,
+                                              gueris)
     dat<-dat %>% as.data.frame()
-    liste<-dat %>% apply(2, clean_name) %>% as.data.frame() %>% select(nom)
-    dat<- cbind(liste, dat[,-c(1,2)])
-    dat<- dat %>% filter(nom == input$loc)
 
-    #glimpse(dat)
-    #apply(dat, 2, sumna) #non besoin , France est dans les individus (pour Vincent)
+    #liste<-dat %>% apply(2, replace_acc) %>% as.data.frame() %>% select(nom)
+    dat$nom<-dat$nom %>% as.data.frame() %>% apply(1, replace_acc)
+    #dat<- cbind(liste, dat[,-1])
+    dat<- dat %>% filter(nom == input$loc)
+    glimpse(dat)
+    dat
   })
 
   output$hosp <- renderValueBox({
