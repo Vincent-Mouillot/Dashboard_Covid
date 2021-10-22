@@ -197,4 +197,33 @@ shinyServer(function(input, output) {
           labs(title = "Arrivée en hopital")
   ) )
 
+
+  #####3e onglet carto
+  map_fr<-function(){
+    FranceFormes <- getData(name="GADM", country="FRA", level=2)
+    plot(FranceFormes, main="Carte de la France, départements")
+    Fr<-st_as_sf(FranceFormes)
+  }
+
+  donnc <- eventReactive(input$boutcart, {
+    # recuperation donnees mise en forme vector de somme
+    ap <- paste(
+      "https://coronavirusapi-france.now.sh/AllDataByDate?date=",
+      as.character(input$datc),
+      sep = "")
+    donneebr <- GET(ap)
+    lis <- fromJSON(rawToChar(donneebr$content))
+    # On obtient la liste des infos par dep pour une date précis
+    dat <- lis$allFranceDataByDate %>% select(tolower(input$var))
+    dat
+  })
+
+  output$depa<-renderUI({
+    li_dep<-liste_departement()
+
+    selectInput("departe",
+                "Choisir dep",
+                choices = c("France",li_dep)
+    )
+  })
 })
