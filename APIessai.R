@@ -206,3 +206,16 @@ as.Date(rownames(ess))
 
 listedep$allDataByDepartement %>% select(deces)
 
+## CARTOGRAPHIE
+library(leaflet)
+library(sf)
+library(png)
+France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
+dep <- France %>%
+  dplyr::filter(nom %in% "Mayotte")
+outrmer<- readPNG("Dash_COVID/Departements-d-Outre-Mer-122.png")
+leaflet() %>%
+  setView(3, 47, zoom=5.05)%>% #"Esri.WorldTerrain" "OpenTopoMap" Esri.WorldPhysical
+  addProviderTiles("Esri.WorldPhysical")  %>% #Esri.WorldImagery
+  addPolygons(data=dep, weight = 2, color="orange",fillOpacity=0.55) %>%
+  addPolylines(data = France, color="black", fillOpacity = 0, weight = 1, opacity = 1)
