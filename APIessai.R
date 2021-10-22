@@ -4,14 +4,17 @@ library(rjson)
 
 
 
-ap<-"https://coronavirusapi-france.now.sh/AllDataByDate?date=2020-04-19"
+ap<-"https://coronavirusapi-france.now.sh/AllDataByDate?date=2020-08-11"
 donneebr<-GET(ap)
 
 liste<-fromJSON(rawToChar(donneebr$content)) #On obtient la liste des infos par dep pour une date précise
 
-attributes(liste)
 
-dat<-liste$allFranceDataByDate[,c(4:7)]
+dat<-liste$allFranceDataByDate[,c(1,4:7)]
+
+f<-unique(dat[,1])
+dat<-dat %>%filter( code== f)
+
 
 sumna<-function(x){
   sum(x,na.rm = TRUE)

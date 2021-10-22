@@ -63,7 +63,8 @@ shinyServer(function(input, output) {
                                               deces,
                                               gueris)
     dat<-dat %>% as.data.frame()
-
+    un<-unique(dat[,1])
+    dat<-dat %>% filter(nom == un)
     #liste<-dat %>% apply(2, replace_acc) %>% as.data.frame() %>% select(nom)
     dat$nom<-dat$nom %>% as.data.frame() %>% apply(1, replace_acc)
     #dat<- cbind(liste, dat[,-1])
