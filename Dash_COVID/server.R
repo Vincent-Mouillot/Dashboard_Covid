@@ -8,6 +8,8 @@ library(dplyr)
 library(RColorBrewer)
 library(colorspace)
 library(colorscience)
+library(tibble)
+library(stringr)
 
 shinyServer(function(input, output) {
   #####Recup liste dep
@@ -33,6 +35,30 @@ shinyServer(function(input, output) {
     sum(x, na.rm = TRUE)
   }
 
+  #####Recupération liste dep
+  clean_name<-function(x){
+    str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
+  }
+
+  liste_departement<-function(){
+    ldep<-"https://geo.api.gouv.fr/departements"
+    listede<-GET(ldep)
+    listede<-fromJSON(rawToChar(listede$content))
+
+    listede<-listede %>% apply(2,clean_name) %>% as.data.frame() %>% select(nom)
+    listede[,1]
+  }
+
+  output$loc<-renderUI({
+    li_dep<-liste_departement()
+
+    selectInput("loc",
+                "Choisir dep",
+                choices = c("France",li_dep) #pb avec France
+    )
+  })
+
+
   donn <- eventReactive(input$bout, {
     # recuperation donnees mise en forme vector de somme
     ap <- paste(
@@ -42,35 +68,39 @@ shinyServer(function(input, output) {
     donneebr <- GET(ap)
     lis <- fromJSON(rawToChar(donneebr$content))
     # On obtient la liste des infos par dep pour une date précis
-    dat <- lis$allFranceDataByDate[, c(4:9)]
-    glimpse(dat)
-    apply(dat, 2, sumna)
+    dat <- lis$allFranceDataByDate[, c(1,2,4:9)]
+    dat<-dat %>% as.data.frame()
+    liste<-dat %>% apply(2, clean_name) %>% as.data.frame() %>% select(nom)
+    dat<- cbind(liste, dat[,-c(1,2)])
+    dat<- dat %>% filter(nom == input$loc)
+
+    #glimpse(dat)
+    #apply(dat, 2, sumna) #non besoin , France est dans les individus (pour Vincent)
   })
-
-
 
   output$hosp <- renderValueBox({
-    valueBox(donn()[1], subtitle = "Hosp")
+    valueBox(donn()[2], subtitle = "Hosp")
   })
 
+
   output$rea <- renderValueBox({
-    valueBox(donn()[2], subtitle = "Rea")
+    valueBox(donn()[3], subtitle = "Rea")
   })
 
   output$nhosp <- renderValueBox({
-    valueBox(donn()[3], subtitle = "Nvle Hosp")
+    valueBox(donn()[4], subtitle = "Nvle Hosp")
   })
 
   output$nrea <- renderValueBox({
-    valueBox(donn()[4], subtitle = "Nvle Rea")
+    valueBox(donn()[5], subtitle = "Nvle Rea")
   })
 
   output$de <- renderValueBox({
-    valueBox(donn()[5], subtitle = "Deces")
+    valueBox(donn()[6], subtitle = "Deces")
   })
 
   output$gu <- renderValueBox({
-    valueBox(donn()[6], subtitle = "Guerison")
+    valueBox(donn()[7], subtitle = "Guerison")
   })
 
 

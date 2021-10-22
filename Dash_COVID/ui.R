@@ -40,9 +40,12 @@ body <- dashboardBody(
                     value = "2021-08-12",
                     weekstart = 1,
                     language = "fr"), # changer jour min pour mettre 1er jour contamination
-          actionButton("bout", "Affichage"),
           width = 3
+          uiOutput("loc"),
+          actionButton("bout", "Affichage"),
         ),
+
+
         mainPanel( # 3lignes de deux values box
           h2("Widgets tab content"),
           fluidRow(
