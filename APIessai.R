@@ -219,3 +219,20 @@ leaflet() %>%
   addProviderTiles("Esri.WorldPhysical")  %>% #Esri.WorldImagery
   addPolygons(data=dep, weight = 2, color="orange",fillOpacity=0.55) %>%
   addPolylines(data = France, color="black", fillOpacity = 0, weight = 1, opacity = 1)
+
+
+france_json <- geojsonio::geojson_read("departements-avec-outre-mer.geojson", what = "sp")
+france_json<-st_transform(france_json)
+spdf <- rmapshaper::ms_simplify(france_json, keep = 0.1)
+#pal <- colorNumeric("Blues", domain = spdf$nom)
+epsg2163 <- leafletCRS(
+  crsClass = "L.Proj.CRS",
+  code = "EPSG:2163",
+  proj4def = "+proj=laea +lat_0=45 +lon_0=-100 +x_0=0 +y_0=0 +a=6370997
+  +b=6370997 +units=m +no_defs",
+  resolutions = 2^(16:7))
+
+leaflet(spdf, options = leafletOptions(crs = epsg2163)) %>%
+  addPolygons(weight = 1, color = "#444444", opacity = 1, fillOpacity = 0.7,
+              smoothFactor = 0.5, labelOptions = labelOptions(direction = "auto")
+             )
