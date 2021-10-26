@@ -65,10 +65,14 @@ body <- dashboardBody(
             valueBoxOutput("de"),
             valueBoxOutput("gu")
           )
-        )
+        ),
+
         # actionButton de telechargement a ajouter sur le side panel
         # possibilite d ajouter un choix pour la france ou un dep particulier
-      )
+
+        leafletOutput("mymap")
+
+        )
     ),
     tabItem(
       tabName = "hist",
