@@ -50,6 +50,9 @@ body <- dashboardBody(
 
 
         mainPanel( # 3lignes de deux values box
+
+          leafletOutput("mymap", width="75%", height="75%"),
+
           h2("Widgets tab content"),
           fluidRow(
             valueBoxOutput("hosp"), #CHANGER les noms
@@ -65,12 +68,10 @@ body <- dashboardBody(
             valueBoxOutput("de"),
             valueBoxOutput("gu")
           )
-        ),
+        )
 
         # actionButton de telechargement a ajouter sur le side panel
         # possibilite d ajouter un choix pour la france ou un dep particulier
-
-        leafletOutput("mymap")
 
         )
     ),
@@ -124,6 +125,7 @@ body <- dashboardBody(
       ),
       mainPanel(
         plotOutput("map")
+
       )
     )
 

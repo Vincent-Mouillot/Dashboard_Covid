@@ -223,7 +223,7 @@ shinyServer(function(input, output) {
 
   output$depa<-renderUI({
     li_dep<-liste_departement()
-a
+
     selectInput("departe",
                 "Choisir dep",
                 choices = c("France",li_dep)
@@ -231,8 +231,7 @@ a
   })
 
 France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
-  dep <- France %>%
-    dplyr::filter(nom %in% "Martinique")
+# dep <- France %>%  dplyr::filter(nom %in% "Doubs")
 
 coordGPS<-function(dep){
   long<-3 ; lat<-47 ; z=5.05
@@ -243,14 +242,15 @@ coordGPS<-function(dep){
       }  else {long<-3 ; lat<-47 ; z=5.05}
  return(c(long, lat, z))
 }
-
    output$mymap <- renderLeaflet(
     leaflet() %>%
-    setView(coordGPS(d)[0], coordGPS(d)[1],
-            zoom=coordGPS(d)[2])%>% #"Esri.WorldTerrain" "OpenTopoMap" Esri.WorldPhysical
-    addProviderTiles("Esri.WorldPhysical")  %>% #Esri.WorldImagery
-    addPolygons(data=dep, weight = 2, color="orange",fillOpacity=0.55) %>%
-    addPolylines(data = France, color="black", fillOpacity = 0, weight = 1, opacity = 1) %>%
+    setView(lng =  3,lat =  47,
+            zoom=5.05)%>% #"Esri.WorldTerrain"
+      #"OpenTopoMap" Esri.WorldPhysical
+    addProviderTiles("Esri.WorldTerrain")  %>% #Esri.WorldImagery
+  #  addPolygons(data=dep, weight = 2, color="orange",fillOpacity=0.55) %>%
+    addPolylines(data = France, color="black", fillOpacity = 0, weight = 1,
+                 opacity = 1) %>%
     addMiniMap(width = 75, height = 75, zoomLevelOffset = -7)
    )
 
