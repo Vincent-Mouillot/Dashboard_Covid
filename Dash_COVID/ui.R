@@ -6,7 +6,7 @@ library(httr)
 library(jsonlite)
 library(dplyr)
 
-
+library(DT)
 
 
 # Header bar of the dashboard (ie le titre du projet)
@@ -21,6 +21,9 @@ sidebar <- dashboardSidebar(sidebarMenu(
            icon = icon("head-side-virus")),
   menuItem("Historique",
            tabName = "hist",
+           icon = icon("grunt")),
+  menuItem("table",
+           tabName = "table",
            icon = icon("grunt"))
 ))
 
@@ -93,7 +96,48 @@ body <- dashboardBody(
       )
       # actionButton de telechargement a ajouter soit sur le main panel soit side panel
       #ajouter input ggplot et input choix dep
-    )
+    ),
+    tabItem(
+      tabName = "table",
+      fluidRow(
+        column(6,
+               box(title = "Data", status = "success", solidHeader = T, width = 12,
+                   splitLayout(
+                     cellArgs = list(style = "padding: 10px"),
+                     dateRangeInput("t_range",
+                                    "Selectionner la periode",
+                                    min = "2020-03-18",
+                                    max = "2021-08-12",
+                                    start = "2020-03-18",
+                                    end = "2021-08-12",
+                                    weekstart = 1,
+                                    language = "fr",
+                                    separator = "au"),
+                     cellWidths = c(400,200),
+                     selectInput("select2","select2",c("A3","A4","A5"), selected = "A3"))
+               ),
+               DTOutput("tab_don")
+        ),
+        column(6,
+               box(title = "Data", status = "success", solidHeader = T, width = 12,
+
+                     cellArgs = list(style = "padding: 10px"),
+                     selectInput("select11","select11",c("A1","A2","A3"), selected = "A1")
+
+               )
+               )
+
+
+        )
+
+
+
+
+
+
+      )
+
+
   )
 )
 

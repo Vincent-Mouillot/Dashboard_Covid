@@ -182,7 +182,7 @@ shinyServer(function(input, output) {
           labs(title = "Cumul décès et guérison")
   ) )
 
-  output$graph_nvx<- renderPlotly(
+  output$graph_nvx <- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
              aes(x = as.Date(rownames(donn_dep())))) +
@@ -197,5 +197,35 @@ shinyServer(function(input, output) {
           ylab("Nombre de personne") +
           labs(title = "Arrivée en hopital")
   ) )
+
+
+  #####Onglet table donnees
+  t_dep<- reactive({
+    apdep<-paste(
+      "https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
+      as.character("Rhône"),
+      sep = "")
+    donndep<-GET(apdep)
+    tdep<-fromJSON(rawToChar(donndep$content))
+    glimpse(tdep$allDataByDepartement)
+    don<-mef_don_dep(tdep$allDataByDepartement,
+                     input$t_range[1],
+                     input$t_range[2])
+    glimpse(don)
+    don
+  })
+
+  output$tab_don <- renderDT({
+    df <- t_dep()
+
+    df %>%
+      datatable(filter = 'top',
+                rownames = TRUE,
+                colnames = c("Date", "Hosp", "Rea", "Deces", "Gueris", "Nvlle H", "Nvlle R"),
+                options = list(pageLength = 10,
+                               #dom = "lrtip",
+                               #columnDefs = list(list(className = 'dt-center', targets = 0:3)),
+                               language = list(emptyTable = "Pas de données disponibles")))
+  })
 
 })
