@@ -42,7 +42,8 @@ body <- dashboardBody(
                     language = "fr"), # changer jour min pour mettre 1er jour contamination
           width = 3,
           uiOutput("loc"),
-          actionButton("bout", "Affichage")
+          actionButton("bout", "Affichage"),
+          downloadButton('download', 'Telechargement')
         ),
 
 
@@ -83,7 +84,7 @@ body <- dashboardBody(
         uiOutput("ddep"),
         actionButton("boutrange",
                      "Affichage"),
-        downloadButton("tel"),
+        downloadButton('downloadData', 'Telechargement'),
         width = 4
       ),
       mainPanel(
@@ -91,7 +92,7 @@ body <- dashboardBody(
         plotlyOutput("graph_cumul"),
         plotlyOutput("graph_nvx")
       )
-      # actionButton de telechargement a ajouter soit sur le main panel soit side panel
+     # actionButton de telechargement a ajouter soit sur le main panel soit side panel
       #ajouter input ggplot et input choix dep
     )
   )

@@ -98,6 +98,15 @@ shinyServer(function(input, output) {
     valueBox(donn()[7], subtitle = "Guerison")
   })
 
+  output$download <- downloadHandler(
+    filename = function() {
+      paste('donn', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+      write.csv(donn(), con)
+    }
+  )
+
 
 
   #####Deuxieme onglet pour chaque dep
@@ -197,5 +206,15 @@ shinyServer(function(input, output) {
           ylab("Nombre de personne") +
           labs(title = "Arrivée en hopital")
   ) )
+
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste('donn_dep', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+      write.csv(donn_dep(), con)
+    }
+  )
+
 
 })
