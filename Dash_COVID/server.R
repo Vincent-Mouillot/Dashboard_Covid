@@ -50,7 +50,7 @@ shinyServer(function(input, output) {
   donn <- eventReactive(input$bout, {
     # recuperation donnees mise en forme vector de somme
     ap <- paste(
-            "https://coronavirusapi-france.now.sh/AllDataByDate?date=",
+      "https://coronavirusapifr.herokuapp.com/data/france-by-date/",
             as.character(input$jj),
             sep = "")
     donneebr <- GET(ap)
@@ -202,11 +202,11 @@ shinyServer(function(input, output) {
 
 
   #####3e onglet carto
-  map_fr<-function(){
-    FranceFormes <- getData(name="GADM", country="FRA", level=2)
-    plot(FranceFormes, main="Carte de la France, départements")
-    Fr<-st_as_sf(FranceFormes)
-  }
+  # map_fr<-function(){
+  #   FranceFormes <- getData(name="GADM", country="FRA", level=2)
+  #   plot(FranceFormes, main="Carte de la France, départements")
+  #   Fr<-st_as_sf(FranceFormes)
+  # }
 
   donnc <- eventReactive(input$boutcart, {
     # recuperation donnees mise en forme vector de somme
@@ -221,38 +221,36 @@ shinyServer(function(input, output) {
     dat
   })
 
-  output$depa<-renderUI({
-    li_dep<-liste_departement()
-
-    selectInput("departe",
-                "Choisir dep",
-                choices = c("France",li_dep)
-    )
-  })
+  # output$depa<-renderUI({
+  #   lit_dep<-liste_departement()
+  #
+  #   selectInput("departem",
+  #               "Choisir dep",
+  #               choices = c("France",lit_dep)
+  #   )
+  # })
 
 France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
-# dep <- France %>%  dplyr::filter(nom %in% "Doubs")
+#dep <- France %>%  dplyr::filter(nom %in% "Doubs")
 
-coordGPS<-function(dep){
-  long<-3 ; lat<-47 ; z=5.05
- if (dep == "Mayotte"){long <-45.1181; lat<--12.825 ; z=20
-       } else if (dep == "Guyane"){lat = 3.965; long = -53.02 ;z=3
-      }  else if(dep =="La Réunion"){ lat=-21.124; long= 55.5386 ; z=22
-      } else if (dep =="Martinique"){ lat = 14.6409; long= -60.9988 ; z=20
-      }  else {long<-3 ; lat<-47 ; z=5.05}
- return(c(long, lat, z))
-}
-   output$mymap <- renderLeaflet(
-    leaflet() %>%
-    setView(lng =  3,lat =  47,
-            zoom=5.05)%>% #"Esri.WorldTerrain"
-      #"OpenTopoMap" Esri.WorldPhysical
-    addProviderTiles("Esri.WorldTerrain")  %>% #Esri.WorldImagery
-  #  addPolygons(data=dep, weight = 2, color="orange",fillOpacity=0.55) %>%
-    addPolylines(data = France, color="black", fillOpacity = 0, weight = 1,
-                 opacity = 1) %>%
-    addMiniMap(width = 75, height = 75, zoomLevelOffset = -7)
-   )
+
+
+   output$mymap <- renderLeaflet({
+     #donn_dep()$gueris
+     #bin <- c(0, 50, 100, Inf)
+   # pal <- colorBin("YlOrRd", domain =  donnc()$input$Deces, bins = bin)
+
+     isolate({
+       long<-3 ; lat<-47 ; z=5.05
+       leaflet() %>%
+         setView(long,lat,z) %>%
+         addProviderTiles("Esri.WorldTerrain")%>%
+         addMiniMap(width = 75, height = 75, zoomLevelOffset = -7) %>%
+         addPolylines(data = France, color="black", fillOpacity = 0,
+                      weight = 1, opacity = 1)
+
+     })
+   })
 
 
 })

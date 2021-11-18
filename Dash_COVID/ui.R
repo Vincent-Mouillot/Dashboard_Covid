@@ -5,6 +5,7 @@ library(plotly)
 library(httr)
 library(jsonlite)
 library(dplyr)
+library(leaflet)
 
 
 
@@ -51,7 +52,6 @@ body <- dashboardBody(
 
         mainPanel( # 3lignes de deux values box
 
-          leafletOutput("mymap", width="75%", height="75%"),
 
           h2("Widgets tab content"),
           fluidRow(
@@ -69,7 +69,6 @@ body <- dashboardBody(
             valueBoxOutput("gu")
           )
         )
-
         # actionButton de telechargement a ajouter sur le side panel
         # possibilite d ajouter un choix pour la france ou un dep particulier
 
@@ -112,7 +111,7 @@ body <- dashboardBody(
                   value = "2021-08-12",
                   weekstart = 1,
                   language = "fr"),
-        uiOutput("depa"),
+       # uiOutput("departem"),
         selectInput("var",
                     "Choix variable",
                     choices = c("Hospitalises",
@@ -122,23 +121,16 @@ body <- dashboardBody(
                                 "NouvellesHospitalisations",
                                 "NouvellesReanimations")),
         actionButton("boutcart", "Affichage")
+
       ),
       mainPanel(
-        plotOutput("map")
+       # plotOutput("map"),
+        leafletOutput("mymap")
 
       )
     )
-
-
-
-
-
   )
 )
-
-
-
-
 
 # Mise en page du dashboard
 dashboardPage(
