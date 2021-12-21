@@ -50,7 +50,7 @@ shinyServer(function(input, output) {
   donn <- eventReactive(input$bout, {
     # recuperation donnees mise en forme vector de somme
     ap <- paste(
-      "https://coronavirusapifr.herokuapp.com/data/france-by-date/",
+            "https://coronavirusapi-france.now.sh/AllDataByDate?date=",
             as.character(input$jj),
             sep = "")
     donneebr <- GET(ap)
