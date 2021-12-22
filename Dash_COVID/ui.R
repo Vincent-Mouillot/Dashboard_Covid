@@ -86,7 +86,7 @@ body <- dashboardBody(
                        start = "2020-03-18",
                        end = "2021-12-12",
                        weekstart = 1,
-                       language = "en",
+                       language = "fr",
                        separator = "au"),
         uiOutput("ddep"),
         actionButton("boutrange",
