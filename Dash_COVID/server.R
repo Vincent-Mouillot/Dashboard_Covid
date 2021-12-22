@@ -164,9 +164,8 @@ shinyServer(function(input, output) {
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
     # glimpse(donneedep$allDataByDepartement)
-    don<-mef_don_dep(donneedep,
-                     input$range[1],
-                     input$range[2])
+    don<-mef_don_dep(donneedep,"2021-08-12",
+                     "2021-12-12")
     glimpse(don)
     don
   })
