@@ -278,3 +278,59 @@ centroid_df <- as.data.frame(centroids)
 
 # affichage des premières lignes
 head(centroid_df)
+
+
+
+
+
+mef_don_dep<-function(x,date_depart,date_fin){
+  x<-x %>%
+    # filter(sourceType == "sante-publique-france-data") %>%
+    select(date,
+           hosp,
+           rea,
+           dchosp,
+           incid_hosp,
+           incid_rea,
+           incid_dchosp,
+           incid_rad
+    )
+  donnee<-x %>%
+    data.frame(row.names = x$date) %>%
+   select(-date)
+
+  seqD<-seq.Date(from=as.Date(date_depart),
+                 to=as.Date(date_fin),
+                 by=1)
+  d<-donnee[c(as.character( seqD)),]
+
+  d
+}
+
+
+apdep<-"https://coronavirusapifr.herokuapp.com/data/departement/rhone"
+#marche que pour le Rhone pour le moment
+donndep<-GET(apdep)
+donneedep<-fromJSON(rawToChar(donndep$content))
+# glimpse(donneedep$allDataByDepartement)
+don<-mef_don_dep(donneedep,
+                  "2021-08-12",
+                 "2021-12-12")
+glimpse(don)
+don
+
+ggplotly(
+  ggplot(data = don,
+         aes(x = as.Date(date))) +
+    geom_line(mapping = aes(y=hosp,
+                            colour = "hosp")) +
+    geom_line(mapping = aes(y=rea,
+                            colour = "rea" )) +
+    scale_colour_manual("",
+                        breaks = c("hosp","rea"),
+                        values = c("blue", "orange")) +
+    xlab("Date") +
+    ylab("Nombre de personne") +
+    labs(title = "Situation hopitaux jour par jour")
+)
+

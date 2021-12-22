@@ -16,7 +16,9 @@ library(leaflet)
 shinyServer(function(input, output) {
   #####Recup liste dep
   replace_acc<-function(x){
-    str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
+     x <- str_replace_all(x,c("Ã¨" = "e", "Ã´" = "o", "Ã©" = "e"))
+    str_to_lower(x) # A modifier pour propre
+
   }
 
   liste_departement<-function(){
@@ -122,17 +124,19 @@ shinyServer(function(input, output) {
   #####Deuxieme onglet pour chaque dep
   mef_don_dep<-function(x,date_depart,date_fin){
     x<-x %>%
-      filter(sourceType == "sante-publique-france-data") %>%
+     # filter(sourceType == "sante-publique-france-data") %>%
       select(date,
-             hospitalises,
-             reanimation,
-             deces,
-             gueris,
-             nouvellesHospitalisations,
-             nouvellesReanimations)
+             hosp,
+             rea,
+             dchosp,
+             incid_hosp,
+             incid_rea,
+             incid_dchosp,
+             incid_rad
+             )
     donnee<-x %>%
-            data.frame(row.names = x$date) %>%
-            select(-date)
+            data.frame(row.names = x$date) #  %>%
+            # select(-date)
 
     seqD<-seq.Date(from=as.Date(date_depart),
                    to=as.Date(date_fin),
@@ -148,19 +152,19 @@ shinyServer(function(input, output) {
 
     selectInput("departe",
                 "Choisir dep",
-                choices = c("France",li_dep) #pb avec France
+                choices = li_dep #pb avec France
                 )
   })
 
   donn_dep<- eventReactive(input$boutrange, {
     apdep<-paste(
-      "https://coronavirusapi-france.now.sh/AllDataByDepartement?Departement=",
+      "https://coronavirusapifr.herokuapp.com/data/live/departement/",
       as.character(input$departe), #changer avec input mais recup liste dep avant
       sep = "") #marche que pour le Rhone pour le moment
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
-    glimpse(donneedep$allDataByDepartement)
-    don<-mef_don_dep(donneedep$allDataByDepartement,
+    # glimpse(donneedep$allDataByDepartement)
+    don<-mef_don_dep(donneedep,
                      input$range[1],
                      input$range[2])
     glimpse(don)
@@ -172,10 +176,10 @@ shinyServer(function(input, output) {
   output$graph_sit<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(rownames(donn_dep())))) +
-          geom_line(mapping = aes(y=hospitalises,
+             aes(x = as.Date(date))) +
+          geom_line(mapping = aes(y=hosp,
                                   colour = "hosp")) +
-          geom_line(mapping = aes(y=reanimation,
+          geom_line(mapping = aes(y=rea,
                                   colour = "rea" )) +
           scale_colour_manual("",
                               breaks = c("hosp","rea"),
@@ -188,10 +192,10 @@ shinyServer(function(input, output) {
   output$graph_cumul<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(rownames(donn_dep())))) +
-          geom_line(mapping = aes(y=deces,
+             aes(x = as.Date(date))) +
+          geom_line(mapping = aes(y = incid_dchosp,
                                   colour = "deces")) +
-          geom_line(mapping = aes(y=gueris,
+          geom_line(mapping = aes(y = incid_rad,
                                   colour = "gueris" )) +
           scale_colour_manual("",
                               breaks = c("deces","gueris"),
@@ -204,10 +208,10 @@ shinyServer(function(input, output) {
   output$graph_nvx<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(rownames(donn_dep())))) +
-          geom_line(mapping = aes(y=nouvellesHospitalisations,
+             aes(x = as.Date(date))) +
+          geom_line(mapping = aes(y=incid_hosp,
                                   colour = "nvlleh")) +
-          geom_line(mapping = aes(y=nouvellesReanimations,
+          geom_line(mapping = aes(y=incid_rea,
                                   colour = "nvller" )) +
           scale_colour_manual("",
                               breaks = c("nvlleh","nvller"),
@@ -217,7 +221,6 @@ shinyServer(function(input, output) {
           labs(title = "Arrivée en hopital")
   ) )
 
-<<<<<<< HEAD
 
   #####3e onglet carto
   # map_fr<-function(){
@@ -269,7 +272,8 @@ France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
 
      })
    })
-=======
+
+
   output$downloadData <- downloadHandler(
     filename = function() {
       paste('donn_dep', Sys.Date(), '.csv', sep='')
@@ -278,7 +282,7 @@ France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
       write.csv(donn_dep(), con)
     }
   )
->>>>>>> master
+
 
 
 })
