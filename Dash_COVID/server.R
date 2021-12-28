@@ -142,14 +142,14 @@ shinyServer(function(input, output) {
              incid_dchosp,
              incid_rad
              )
-    donnee<-x %>%
-            data.frame(row.names = x$date) #  %>%
-            # select(-date)
+    donnee<-x %>% as.data.frame()
+            data.frame(row.names = x$date)  %>%
+            select(-date)
 
     seqD<-seq.Date(from=as.Date(date_depart),
                    to=as.Date(date_fin),
                    by=1)
-    d<-donnee[c(as.character( seqD)),]
+    d<-donnee[c(as.character(seqD)),]
 
     d
   }
@@ -167,7 +167,7 @@ shinyServer(function(input, output) {
   donn_dep<- eventReactive(input$boutrange, {
     apdep<-paste(
       "https://coronavirusapifr.herokuapp.com/data/live/departement/",
-      as.character(input$departe), #changer avec input mais recup liste dep avant
+      as.character(replace_acc_onglet2(input$departe)), #changer avec input mais recup liste dep avant
       sep = "") #marche que pour le Rhone pour le moment
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
@@ -184,11 +184,11 @@ shinyServer(function(input, output) {
   output$graph_sit<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(date))) +
+             aes(x = date, group = 1)) +
           geom_line(mapping = aes(y=hosp,
-                                  colour = "hosp")) +
+                                  colour = "hosp", group = 1)) +
           geom_line(mapping = aes(y=rea,
-                                  colour = "rea" )) +
+                                  colour = "rea", group = 1 )) +
           scale_colour_manual("",
                               breaks = c("hosp","rea"),
                               values = c("blue", "orange")) +
@@ -200,11 +200,11 @@ shinyServer(function(input, output) {
   output$graph_cumul<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(date))) +
+             aes(x = as.Date(date), group = 1)) +
           geom_line(mapping = aes(y = incid_dchosp,
-                                  colour = "deces")) +
+                                  colour = "deces", group = 1)) +
           geom_line(mapping = aes(y = incid_rad,
-                                  colour = "gueris" )) +
+                                  colour = "gueris", group = 1 )) +
           scale_colour_manual("",
                               breaks = c("deces","gueris"),
                               values = c("blue", "orange")) +
@@ -216,11 +216,11 @@ shinyServer(function(input, output) {
   output$graph_nvx<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(date))) +
+             aes(x = as.Date(date), group = 1)) +
           geom_line(mapping = aes(y=incid_hosp,
-                                  colour = "nvlleh")) +
+                                  colour = "nvlleh", group = 1)) +
           geom_line(mapping = aes(y=incid_rea,
-                                  colour = "nvller" )) +
+                                  colour = "nvller", group = 1 )) +
           scale_colour_manual("",
                               breaks = c("nvlleh","nvller"),
                               values = c("blue", "orange")) +
@@ -239,14 +239,19 @@ shinyServer(function(input, output) {
 
   donnc <- eventReactive(input$boutcart, {
     # recuperation donnees mise en forme vector de somme
+    date <- paste(day(input$jj),"-",
+                  month(input$jj), "-",
+                  year(input$jj), sep = ""
+    )
     ap <- paste(
-      "https://coronavirusapi-france.now.sh/AllDataByDate?date=",
-      as.character(input$datc),
+      #"https://coronavirusapi-france.now.sh/AllDataByDate?date=",
+      "https://coronavirusapifr.herokuapp.com/data/departements-by-date/",
+      as.character(date),
       sep = "")
     donneebr <- GET(ap)
     lis <- fromJSON(rawToChar(donneebr$content))
     # On obtient la liste des infos par dep pour une date précis
-    dat <- lis$allFranceDataByDate %>% select(tolower(input$var))
+    dat <- lis # %>% select(tolower(input$var))
     dat
   })
 
@@ -266,8 +271,8 @@ France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
 
    output$mymap <- renderLeaflet({
      #donn_dep()$gueris
-     #bin <- c(0, 50, 100, Inf)
-   # pal <- colorBin("YlOrRd", domain =  donnc()$input$Deces, bins = bin)
+    bin <- c(0, 50, 100, Inf)
+   pal <- colorBin("YlOrRd", domain =  donnc()$hosp, bins = bin)
 
      isolate({
        long<-3 ; lat<-47 ; z=5.05

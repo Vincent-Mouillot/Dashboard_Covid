@@ -280,9 +280,6 @@ centroid_df <- as.data.frame(centroids)
 head(centroid_df)
 
 
-
-
-
 mef_don_dep<-function(x,date_depart,date_fin){
   x<-x %>%
     # filter(sourceType == "sante-publique-france-data") %>%
@@ -295,9 +292,9 @@ mef_don_dep<-function(x,date_depart,date_fin){
            incid_dchosp,
            incid_rad
     )
-  donnee<-x %>%
-    data.frame(row.names = x$date) %>%
-   select(-date)
+ # donnee<-x %>%
+#    data.frame(row.names = x$date) %>%
+#   select(-date)
 
   seqD<-seq.Date(from=as.Date(date_depart),
                  to=as.Date(date_fin),
