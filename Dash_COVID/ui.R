@@ -40,9 +40,10 @@ body <- dashboardBody(
           dateInput("jj",
                     "Selectionner le jour",
                     min = "2019-01-01",
-                    max = "2021-08-12",
-                    value = "2021-08-12",
+                    max = "2021-12-12",
+                    value = "2021-10-11",
                     weekstart = 1,
+                    format = "dd-mm-yyyy",
                     language = "fr"), # changer jour min pour mettre 1er jour contamination
           width = 3,
           uiOutput("loc"),

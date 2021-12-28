@@ -15,7 +15,11 @@ library(leaflet)
 
 shinyServer(function(input, output) {
   #####Recup liste dep
-  replace_acc<-function(x){
+  replace_acc_onglet1<-function(x){
+    x <- str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
+  }
+
+  replace_acc_onglet2<-function(x){
      x <- str_replace_all(x,c("Ã¨" = "e", "Ã´" = "o", "Ã©" = "e"))
     str_to_lower(x) # A modifier pour propre
 
@@ -27,7 +31,7 @@ shinyServer(function(input, output) {
     listede<-fromJSON(rawToChar(listede$content))
 
     listede<-listede %>%
-      apply(2,replace_acc) %>%
+      apply(2,replace_acc_onglet1) %>%
       as.data.frame() %>%
       select(nom) %>%
       arrange(nom)
@@ -51,10 +55,14 @@ shinyServer(function(input, output) {
 
   donn <- eventReactive(input$bout, {
     # recuperation donnees mise en forme vector de somme
+    date <- paste(day(input$jj),"-",
+                  month(input$jj), "-",
+                  year(input$jj), sep = ""
+                  )
     ap <- paste(
       #"https://coronavirusapi-france.now.sh/AllDataByDate?date=",
       "https://coronavirusapifr.herokuapp.com/data/departements-by-date/",
-      as.character(input$jj),
+      as.character(date),
       sep = "")
     donneebr <- GET(ap)
     lis <- fromJSON(rawToChar(donneebr$content))
@@ -75,39 +83,39 @@ shinyServer(function(input, output) {
                           incid_dchosp,
                           incid_rad)
     dat<-dat %>% as.data.frame()
-    un<-unique(dat[,1])
+    # un<-unique(dat[,1])
     #dat<-dat %>% filter(nom == un)
     #liste<-dat %>% apply(2, replace_acc) %>% as.data.frame() %>% select(nom)
-    dat$nom<-dat$lib_dep %>% as.data.frame() %>% apply(1, replace_acc)
+    dat$lib_dep<-dat$lib_dep %>% as.data.frame() %>% apply(1, replace_acc_onglet1)
     #dat<- cbind(liste, dat[,-1])
-    dat<- dat %>% filter(nom == input$loc)
+    dat<- dat %>% filter(lib_dep == input$loc)
     glimpse(dat)
     dat
   })
 
   output$hosp <- renderValueBox({
-    valueBox(donn()[2], subtitle = "Hosp")
+    valueBox(donn()[,2], subtitle = "Hosp")
   })
 
 
   output$rea <- renderValueBox({
-    valueBox(donn()[3], subtitle = "Rea")
+    valueBox(donn()[,3], subtitle = "Rea")
   })
 
   output$nhosp <- renderValueBox({
-    valueBox(donn()[4], subtitle = "Nvle Hosp")
+    valueBox(donn()[,4], subtitle = "Nvle Hosp")
   })
 
   output$nrea <- renderValueBox({
-    valueBox(donn()[5], subtitle = "Nvle Rea")
+    valueBox(donn()[,5], subtitle = "Nvle Rea")
   })
 
   output$de <- renderValueBox({
-    valueBox(donn()[6], subtitle = "Deces")
+    valueBox(donn()[,6], subtitle = "Deces")
   })
 
   output$gu <- renderValueBox({
-    valueBox(donn()[7], subtitle = "Guerison")
+    valueBox(donn()[,7], subtitle = "Guerison")
   })
 
   output$download <- downloadHandler(
@@ -164,8 +172,9 @@ shinyServer(function(input, output) {
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
     # glimpse(donneedep$allDataByDepartement)
-    don<-mef_don_dep(donneedep,"2021-08-12",
-                     "2021-12-12")
+    don<-mef_don_dep(donneedep,
+                     input$range[1],
+                     input$range[2])
     glimpse(don)
     don
   })

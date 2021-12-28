@@ -334,3 +334,62 @@ ggplotly(
     labs(title = "Situation hopitaux jour par jour")
 )
 
+
+API <- "https://coronavirusapifr.herokuapp.com/data/departements-by-date/11-10-2021"
+donneebr <- GET(API)
+lis <- fromJSON(rawToChar(donneebr$content))
+dat <- lis %>% select(lib_dep,
+                      hosp,
+                      rea,
+                      incid_hosp,
+                      incid_rea,
+                      incid_dchosp,
+                      incid_rad)
+dat<-dat %>% as.data.frame()
+# un<-replace_acc_onglet1(unique(dat[,1]))
+dat$lib_dep<-dat$lib_dep %>% as.data.frame() %>% apply(1, replace_acc)
+dat<- dat %>% filter(lib_dep == "Rhône")
+dat[,1]
+
+replace_acc_onglet1<-function(x){
+  x <- str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
+}
+
+
+
+date <- paste(day("2021-10-11"),"-",
+              month("2021-10-11"), "-",
+              year("2021-10-11"), sep = ""
+)
+ap <- paste(
+  #"https://coronavirusapi-france.now.sh/AllDataByDate?date=",
+  "https://coronavirusapifr.herokuapp.com/data/departements-by-date/",
+  as.character(date),
+  sep = "")
+donneebr <- GET(ap)
+lis <- fromJSON(rawToChar(donneebr$content))
+# On obtient la liste des infos par dep pour une date précis
+#dat <- lis$allFranceDataByDate[, c(2,4:9)]
+# dat <- lis$allFranceDataByDate %>% select(nom,
+#                                           hospitalises,
+#                                           reanimation,
+#                                           nouvellesHospitalisations,
+#                                           nouvellesReanimations,
+#                                           deces,
+#                                           gueris)
+dat <- lis %>% select(lib_dep,
+                      hosp,
+                      rea,
+                      incid_hosp,
+                      incid_rea,
+                      incid_dchosp,
+                      incid_rad)
+dat<-dat %>% as.data.frame()
+un<-unique(dat[,1])
+#dat<-dat %>% filter(nom == un)
+#liste<-dat %>% apply(2, replace_acc) %>% as.data.frame() %>% select(nom)
+dat$lib_dep<-dat$lib_dep %>% as.data.frame() %>% apply(1, replace_acc_onglet1)
+#dat<- cbind(liste, dat[,-1])
+dat<- dat %>% filter(lib_dep == input$loc)
+glimpse(dat)
+dat
