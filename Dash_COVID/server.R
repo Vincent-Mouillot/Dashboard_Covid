@@ -13,6 +13,7 @@ library(stringr)
 library(sf)
 library(leaflet)
 library(lubridate)
+library(tidyr)
 
 shinyServer(function(input, output) {
   #####Recup liste dep
@@ -131,7 +132,7 @@ shinyServer(function(input, output) {
 
 
   #####Deuxieme onglet pour chaque dep
-  mef_don_dep<-function(x,dates){
+  mef_don_dep<-function(x,date_depart,date_fin){
     x<-x %>%
      # filter(sourceType == "sante-publique-france-data") %>%
       select(date,
@@ -143,17 +144,17 @@ shinyServer(function(input, output) {
              incid_dchosp,
              incid_rad
              )
+    x$date <- as.Date(x$date, format = "%Y-%mm-%dd")
+    x <- x %>% drop_na()
     donnee<-x %>% as.data.frame()
-            data.frame(row.names = x$date) # %>% mutate(date = as.Date(date))
+            data.frame(row.names = x$date)  # %>%
             # select(-date)
-    donnee$date <- as.Date(donnee$date, format = "%Y-%mm-%dd")
     # date_depart <- as.Date(date_depart, format = "%Y-%mm-%dd")
     # date_fin <- as.Date(date_fin, format = "%Y-%mm-%dd")
-    # if (is.na(date_depart)) return (date_depart <- NULL)
-    # if (is.na(date_fin)) return (date_fin <- NULL)
-    # seqD<-seq.Date(from = date_depart, to =date_fin, by=1)
-
-    d<-donnee[c(as.character(dates)),]
+    seqD<-seq.Date(from = date_depart ,
+                   to =date_fin,
+                   by=1)
+    d<-donnee[c(as.character(seqD)),]
 
     d
   }
@@ -168,15 +169,6 @@ shinyServer(function(input, output) {
                 )
   })
 
-  dates <- eventReactive(input$date_range, {
-    if (is.na(input$range[1]) | is.na(input$range[2])) return (NULL)
-
-    mins<- as.Date(input$date_range[1],format="%Y-%m-%d")
-    maxs<- as.Date(input$date_range[2],format="%Y-%m-%d")
-
-    dates <- seq(from=mins, to=maxs, by = 1)
-  })
-
   donn_dep<- eventReactive(input$boutrange, {
     apdep<-paste(
       "https://coronavirusapifr.herokuapp.com/data/live/departement/",
@@ -186,7 +178,8 @@ shinyServer(function(input, output) {
     donneedep<-fromJSON(rawToChar(donndep$content))
     # glimpse(donneedep$allDataByDepartement)
     don<-mef_don_dep(donneedep,
-                     dates)
+                     input$range[1],
+                     input$range[2])
     glimpse(don)
     don
   })
@@ -196,11 +189,11 @@ shinyServer(function(input, output) {
   output$graph_sit<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = date, group = 1)) +
+             aes(x = as.Date(rownames(donn_dep())))) +
           geom_line(mapping = aes(y=hosp,
-                                  colour = "hosp", group = 1)) +
+                                  colour = "hosp")) +
           geom_line(mapping = aes(y=rea,
-                                  colour = "rea", group = 1 )) +
+                                  colour = "rea")) +
           scale_colour_manual("",
                               breaks = c("hosp","rea"),
                               values = c("blue", "orange")) +
@@ -212,7 +205,7 @@ shinyServer(function(input, output) {
   output$graph_cumul<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = date, group = 1)) +
+             aes(x = as.Date(rownames(donn_dep())), group = 1)) +
           geom_line(mapping = aes(y = incid_dchosp,
                                   colour = "deces", group = 1)) +
           geom_line(mapping = aes(y = incid_rad,
@@ -228,7 +221,7 @@ shinyServer(function(input, output) {
   output$graph_nvx<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(date), group = 1)) +
+             aes(x = as.Date(rownames(donn_dep())), group = 1)) +
           geom_line(mapping = aes(y=incid_hosp,
                                   colour = "nvlleh", group = 1)) +
           geom_line(mapping = aes(y=incid_rea,
