@@ -292,9 +292,9 @@ mef_don_dep<-function(x,date_depart,date_fin){
            incid_dchosp,
            incid_rad
     )
- # donnee<-x %>%
-#    data.frame(row.names = x$date) %>%
-#   select(-date)
+  donnee<-x %>%
+    data.frame(row.names = x$date) %>% mutate(date = dmy(date))
+  #   select(-date)
 
   seqD<-seq.Date(from=as.Date(date_depart),
                  to=as.Date(date_fin),
@@ -311,14 +311,14 @@ donndep<-GET(apdep)
 donneedep<-fromJSON(rawToChar(donndep$content))
 # glimpse(donneedep$allDataByDepartement)
 don<-mef_don_dep(donneedep,
-                  "2021-08-12",
+                 "2021-08-12",
                  "2021-12-12")
 glimpse(don)
 don
 
 ggplotly(
   ggplot(data = don,
-         aes(x = as.Date(date))) +
+         aes(x = date)) +
     geom_line(mapping = aes(y=hosp,
                             colour = "hosp")) +
     geom_line(mapping = aes(y=rea,
