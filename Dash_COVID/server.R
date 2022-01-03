@@ -148,51 +148,72 @@ shinyServer(function(input, output) {
     #x$date<-as.character(x$date)
     #x$date <- as.Date(x$date, format)
     #anydate(x$date)
-    x <- x %>% drop_na()
-    donnee<-x %>% as.data.frame()
-            data.frame(row.names = x$date)  # %>%
+    x <- x %>% na.omit()
+    donnee<-x %>% as.data.frame() # %>% mutate(date = dmy(date))
+            # data.frame(row.names = as.Date(x$date, format = "%Y-%mm-%dd"))  # %>%
             # select(-date)
     # date_depart <- as.Date(date_depart, format = "%Y-%mm-%dd")
     # date_fin <- as.Date(date_fin, format = "%Y-%mm-%dd")
-    seqD<-seq.Date(from = date_depart ,
-                   to =date_fin,
-                   by=1)
+    date_depart <- paste(day(date_depart),"-",
+                  month(date_depart), "-",
+                  year(date_depart), sep = ""
+    )
+
+    date_fin <- paste(day(date_fin),"-",
+                         month(date_fin), "-",
+                         year(date_fin), sep = ""
+    )
+
+    seqD<-seq.Date(from = as.Date(date_depart),
+                   to = as.Date(date_fin),
+                   by = "1 day") #,
+                  # by=1)
     d<-donnee[c(as.character(seqD)),]
 
     d
   }
 
 
-  output$ddep<-renderUI({
-    li_dep<-liste_departement()
+  output$range_date <- renderUI({
+    dateRangeInput("range",
+                   "Selectionner la periode",
+                   min = min(as.Date(donn_dep()$date)),
+                   max = max(as.Date(donn_dep()$date)),
+                   start = min(as.Date(donn_dep()$date)),
+                   end = max(as.Date(donn_dep()$date)),
+                   weekstart = 1,
+                   format = "yyyy-mm-dd",
+                   # language = "fr",
+                   separator = "au")
 
-    selectInput("departe",
-                "Choisir dep",
-                choices = li_dep #pb avec France
-                )
+
+  })
+
+  donn_dep_by_date <- eventReactive(input$boutdate, {
+    don<-mef_don_dep(donneedep, input$range[2],
+                                input$range[1])
   })
 
   donn_dep<- eventReactive(input$boutrange, {
     apdep<-paste(
       "https://coronavirusapifr.herokuapp.com/data/departement/",
-      as.character(replace_acc_onglet2(input$departe)), #changer avec input mais recup liste dep avant
+      as.character(replace_acc_onglet2(input$dep_onglet2)), #changer avec input mais recup liste dep avant
       sep = "") #marche que pour le Rhone pour le moment
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
-    # glimpse(donneedep$allDataByDepartement)
-    don<-mef_don_dep(donneedep,
-                     input$range[1],
-                     input$range[2])
+    glimpse(donneedep$allDataByDepartement)
+
+     donneedep <- donneedep %>% na.omit()
+    donnee<- donneedep %>% as.data.frame()
     glimpse(don)
     don
   })
 
 
-
   output$graph_sit<- renderPlotly(
     ggplotly(
-      ggplot(data = donn_dep(),
-             aes(x = as.Date(rownames(donn_dep())),  format="%Y-%mm-%dd")) +
+      ggplot(data = donn_dep_by_date(),
+             aes(x = as.Date(date)), group = 0) +
           geom_line(mapping = aes(y=hosp,
                                   colour = "hosp")) +
           geom_line(mapping = aes(y=rea,
@@ -208,11 +229,11 @@ shinyServer(function(input, output) {
   output$graph_cumul<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(rownames(donn_dep())), group = 1)) +
+             aes(x = as.Date(date))) +
           geom_line(mapping = aes(y = incid_dchosp,
-                                  colour = "deces", group = 1)) +
+                                  colour = "deces")) +
           geom_line(mapping = aes(y = incid_rad,
-                                  colour = "gueris", group = 1 )) +
+                                  colour = "gueris")) +
           scale_colour_manual("",
                               breaks = c("deces","gueris"),
                               values = c("blue", "orange")) +
@@ -224,11 +245,11 @@ shinyServer(function(input, output) {
   output$graph_nvx<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(rownames(donn_dep())), group = 1)) +
+             aes(x = as.Date(date))) +
           geom_line(mapping = aes(y=incid_hosp,
-                                  colour = "nvlleh", group = 1)) +
+                                  colour = "nvlleh")) +
           geom_line(mapping = aes(y=incid_rea,
-                                  colour = "nvller", group = 1 )) +
+                                  colour = "nvller")) +
           scale_colour_manual("",
                               breaks = c("nvlleh","nvller"),
                               values = c("blue", "orange")) +
@@ -289,7 +310,9 @@ France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
          addProviderTiles("Esri.WorldTerrain")%>%
          addMiniMap(width = 75, height = 75, zoomLevelOffset = -7) %>%
          addPolylines(data = France, color="black", fillOpacity = 0,
-                      weight = 1, opacity = 1)
+                      weight = 1, opacity = 1) %>%
+         addPolygons(data = donn(), stroke = FALSE, fillOpacity = 0.5, smoothFactor = 0.5,
+                      color = ~colorQuantile("YlOrRd", hosp)(hosp) )
 
      })
    })

@@ -292,16 +292,7 @@ mef_don_dep<-function(x,date_depart,date_fin){
            incid_dchosp,
            incid_rad
     )
-  donnee<-x %>%
-    data.frame(row.names = x$date) %>% mutate(date = dmy(date))
-  #   select(-date)
 
-  seqD<-seq.Date(from=as.Date(date_depart),
-                 to=as.Date(date_fin),
-                 by=1)
-  d<-donnee[c(as.character( seqD)),]
-
-  d
 }
 
 
@@ -318,8 +309,8 @@ don
 
 ggplotly(
   ggplot(data = don,
-         aes(x = date)) +
-    geom_line(mapping = aes(y=hosp,
+         aes(x = as.Date(date))) +
+    geom_line(aes(y=hosp,
                             colour = "hosp")) +
     geom_line(mapping = aes(y=rea,
                             colour = "rea" )) +
@@ -331,6 +322,34 @@ ggplotly(
     labs(title = "Situation hopitaux jour par jour")
 )
 
+ggplot(data = don,
+       aes(x = as.Date(date))) +
+  geom_line(mapping = aes(y = incid_dchosp,
+                          colour = "deces")) +
+  geom_line(mapping = aes(y = incid_rad,
+                          colour = "gueris")) +
+  scale_colour_manual("",
+                      breaks = c("deces","gueris"),
+                      values = c("blue", "orange")) +
+  xlab("Date") +
+  ylab("Nombre de personne") +
+  labs(title = "Cumul décès et guérison")
+
+
+ggplotly(
+  ggplot(data = don,
+         aes(x = as.Date(date))) +
+    geom_line(mapping = aes(y=incid_hosp,
+                            colour = "nvlleh")) +
+    geom_line(mapping = aes(y=incid_rea,
+                            colour = "nvller")) +
+    scale_colour_manual("",
+                        breaks = c("nvlleh","nvller"),
+                        values = c("blue", "orange")) +
+    xlab("Date") +
+    ylab("Nombre de personne") +
+    labs(title = "Arrivée en hopital")
+)
 
 API <- "https://coronavirusapifr.herokuapp.com/data/departements-by-date/11-10-2021"
 donneebr <- GET(API)

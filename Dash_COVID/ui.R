@@ -80,22 +80,17 @@ body <- dashboardBody(
       tabName = "hist",
       h2("Widgets tab content"),
       sidebarPanel(
-        dateRangeInput("range",
-                       "Selectionner la periode",
-                       min = "2020-03-18",
-                       max = Sys.Date(),
-                       start = "2020-03-18",
-                       end = Sys.Date(),
-                       weekstart = 1,
-                       # format = "dd/mm/yyyy",
-                       # language = "fr",
-                       separator = "au"),
-        uiOutput("ddep"),
+        selectInput("dep_onglet2", "Choisissez le département",
+                    choices= liste_departement()),
+        # uiOutput("range_date"),
         actionButton("boutrange",
                      "Affichage"),
+        uiOutput("range_date"),
+        actionButton("boutdate", "Affichage"),
         downloadButton('downloadData', 'Telechargement'),
         width = 4
       ),
+
       mainPanel(
         plotlyOutput("graph_sit"),
         plotlyOutput("graph_cumul"),
