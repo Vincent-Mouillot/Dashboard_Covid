@@ -14,6 +14,7 @@ library(sf)
 library(leaflet)
 library(lubridate)
 library(tidyr)
+library(anytime)
 
 shinyServer(function(input, output) {
   #####Recup liste dep
@@ -144,7 +145,9 @@ shinyServer(function(input, output) {
              incid_dchosp,
              incid_rad
              )
-    x$date <- as.Date(x$date, format = "%Y-%mm-%dd")
+    #x$date<-as.character(x$date)
+    #x$date <- as.Date(x$date, format)
+    anydate(x$date)
     x <- x %>% drop_na()
     donnee<-x %>% as.data.frame()
             data.frame(row.names = x$date)  # %>%
