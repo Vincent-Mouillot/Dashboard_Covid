@@ -147,7 +147,7 @@ shinyServer(function(input, output) {
              )
     #x$date<-as.character(x$date)
     #x$date <- as.Date(x$date, format)
-    anydate(x$date)
+    #anydate(x$date)
     x <- x %>% drop_na()
     donnee<-x %>% as.data.frame()
             data.frame(row.names = x$date)  # %>%
