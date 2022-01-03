@@ -171,7 +171,7 @@ shinyServer(function(input, output) {
 
   donn_dep<- eventReactive(input$boutrange, {
     apdep<-paste(
-      "https://coronavirusapifr.herokuapp.com/data/live/departement/",
+      "https://coronavirusapifr.herokuapp.com/data/departement/",
       as.character(replace_acc_onglet2(input$departe)), #changer avec input mais recup liste dep avant
       sep = "") #marche que pour le Rhone pour le moment
     donndep<-GET(apdep)
@@ -189,7 +189,7 @@ shinyServer(function(input, output) {
   output$graph_sit<- renderPlotly(
     ggplotly(
       ggplot(data = donn_dep(),
-             aes(x = as.Date(rownames(donn_dep())))) +
+             aes(x = as.Date(rownames(donn_dep())),  format="%Y-%mm-%dd")) +
           geom_line(mapping = aes(y=hosp,
                                   colour = "hosp")) +
           geom_line(mapping = aes(y=rea,
