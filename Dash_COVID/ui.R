@@ -38,34 +38,34 @@ body <- dashboardBody(
         titlePanel("Données du jour"),
         sidebarPanel(
           dateInput("jj",
-                    "Selectionner le jour",
+                    "Sélectionnez un jour",
                     min = "2019-01-01",
-                    max = Sys.Date() -1, # date d'hier
-                    value = Sys.Date() -1,
+                    max = Sys.Date() -2, # date d'avant-hier
+                    value = Sys.Date() -2,
                     weekstart = 1,
                     format = "dd-mm-yyyy",
                     language = "fr"), # changer jour min pour mettre 1er jour contamination
           width = 3,
           uiOutput("loc"),
           actionButton("bout", "Affichage"),
-          downloadButton('download', 'Telechargement')
+          downloadButton('download', 'Téléchargement')
         ),
 
 
         mainPanel( # 3lignes de deux values box
 
 
-          h2("Widgets tab content"),
+          h2(),
           fluidRow(
             valueBoxOutput("hosp"), #CHANGER les noms
             valueBoxOutput("rea")
           ),
-          h2("Widgets tab content"),
+          h2(),
           fluidRow(
             valueBoxOutput("nhosp"),
             valueBoxOutput("nrea")
           ),
-          h2("Widgets tab content"),
+          h2(),
           fluidRow(
             valueBoxOutput("de"),
             valueBoxOutput("gu")
@@ -78,16 +78,16 @@ body <- dashboardBody(
     ),
     tabItem(
       tabName = "hist",
-      h2("Widgets tab content"),
+      h2("Visualisation sur une période"),
       sidebarPanel(
         selectInput("dep_onglet2", "Choisissez le département",
                     choices= liste_departement()),
         # uiOutput("range_date"),
         actionButton("boutrange",
-                     "Affichage"),
+                     "Afficher des dates"),
         uiOutput("range_date"),
-        actionButton("boutdate", "Affichage"),
-        downloadButton('downloadData', 'Telechargement'),
+        actionButton("boutdate", "Afficher les graphiques"),
+        downloadButton('downloadData', 'Téléchargement'),
         width = 4
       ),
 

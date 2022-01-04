@@ -51,7 +51,7 @@ shinyServer(function(input, output) {
 
     selectInput("loc",
                 "Choisir dep",
-                choices = c("France",li_dep) #pb avec France
+                choices = li_dep #pb avec France
     )
   })
 
@@ -97,28 +97,28 @@ shinyServer(function(input, output) {
   })
 
   output$hosp <- renderValueBox({
-    valueBox(donn()[,2], subtitle = "Hosp")
+    valueBox(donn()[,2], subtitle = "Hospitalisation")
   })
 
 
   output$rea <- renderValueBox({
-    valueBox(donn()[,3], subtitle = "Rea")
+    valueBox(donn()[,3], subtitle = "Réanimation")
   })
 
   output$nhosp <- renderValueBox({
-    valueBox(donn()[,4], subtitle = "Nvle Hosp")
+    valueBox(donn()[,4], subtitle = "Nouvelle Hospitalisation")
   })
 
   output$nrea <- renderValueBox({
-    valueBox(donn()[,5], subtitle = "Nvle Rea")
+    valueBox(donn()[,5], subtitle = "Nouvelle Réanimation")
   })
 
   output$de <- renderValueBox({
-    valueBox(donn()[,6], subtitle = "Deces")
+    valueBox(donn()[,6], subtitle = "Décès")
   })
 
   output$gu <- renderValueBox({
-    valueBox(donn()[,7], subtitle = "Guerison")
+    valueBox(donn()[,7], subtitle = "Guérison")
   })
 
   output$download <- downloadHandler(
@@ -145,12 +145,7 @@ shinyServer(function(input, output) {
              incid_rad
              )
 
-    x<-x %>% as.data.frame() # %>% mutate(date = dmy(date))
-            # data.frame(row.names = as.Date(x$date, format = "%Y-%mm-%dd"))  # %>%
-            # select(-date)
-    # date_depart <- as.Date(date_depart, format = "%Y-%mm-%dd")
-    # date_fin <- as.Date(date_fin, format = "%Y-%mm-%dd")
-
+    x<-x %>% as.data.frame()
     seqD<-seq.Date(from = as.Date(date_depart),
                    to = as.Date(date_fin),
                    length.out=as.numeric(difftime(as.Date(date_fin),as.Date(date_depart) ))) #,
@@ -173,7 +168,6 @@ shinyServer(function(input, output) {
                    # language = "fr",
                    separator = "au")
 
-
   })
 
   donn_dep_by_date <- eventReactive(input$boutdate, {
@@ -185,7 +179,7 @@ shinyServer(function(input, output) {
     apdep<-paste(
       "https://coronavirusapifr.herokuapp.com/data/departement/",
       as.character(replace_acc_onglet2(input$dep_onglet2)), #changer avec input mais recup liste dep avant
-      sep = "") #marche que pour le Rhone pour le moment
+      sep = "")
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
     glimpse(donneedep$allDataByDepartement)
