@@ -22,10 +22,10 @@ sidebar <- dashboardSidebar(sidebarMenu(
            icon = icon("head-side-virus")),
   menuItem("Historique",
            tabName = "hist",
-           icon = icon("grunt")),
-  menuItem("Carte",
-           tabName = "carto",
            icon = icon("grunt"))
+  # menuItem("Carte",
+  #          tabName = "carto",
+  #          icon = icon("grunt"))
 ))
 
 # Corps du dashboard avec les graphes et les values box
@@ -98,35 +98,35 @@ body <- dashboardBody(
       )
      # actionButton de telechargement a ajouter soit sur le main panel soit side panel
       #ajouter input ggplot et input choix dep
-    ),
-    tabItem(
-      tabName = "carto",
-      sidebarPanel(
-        dateInput("datc",
-                  "Choisir date",
-                  min = "2019-01-01",
-                  max = Sys.Date() ,
-                  value = "2021-08-12",
-                  weekstart = 1,
-                  language = "fr"),
-       # uiOutput("departem"),
-        selectInput("var",
-                    "Choix variable",
-                    choices = c("hosp",
-                                "rea",
-                                "dchosp",
-                                "incid_rad",
-                                "incid_hosp",
-                                "incid_rea")),
-        actionButton("boutcart", "Affichage")
-
-      ),
-      mainPanel(
-       # plotOutput("map"),
-        leafletOutput("mymap")
-
-      )
     )
+    # tabItem(
+    #   tabName = "carto",
+    #   sidebarPanel(
+    #     dateInput("datc",
+    #               "Choisir date",
+    #               min = "2019-01-01",
+    #               max = Sys.Date() ,
+    #               value = "2021-08-12",
+    #               weekstart = 1,
+    #               language = "fr"),
+    #    # uiOutput("departem"),
+    #     selectInput("var",
+    #                 "Choix variable",
+    #                 choices = c("hosp",
+    #                             "rea",
+    #                             "dchosp",
+    #                             "incid_rad",
+    #                             "incid_hosp",
+    #                             "incid_rea")),
+    #     actionButton("boutcart", "Affichage")
+    #
+    #   ),
+    #   mainPanel(
+    #    # plotOutput("map"),
+    #     leafletOutput("mymap")
+    #
+    #   )
+    # )
   )
 )
 

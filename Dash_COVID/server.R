@@ -135,7 +135,6 @@ shinyServer(function(input, output) {
   #####Deuxieme onglet pour chaque dep
   mef_don_dep<-function(x,date_depart,date_fin){
     x<-x %>%
-     # filter(sourceType == "sante-publique-france-data") %>%
       select(date,
              hosp,
              rea,
@@ -145,31 +144,19 @@ shinyServer(function(input, output) {
              incid_dchosp,
              incid_rad
              )
-    #x$date<-as.character(x$date)
-    #x$date <- as.Date(x$date, format)
-    #anydate(x$date)
-    x <- x %>% na.omit()
-    donnee<-x %>% as.data.frame() # %>% mutate(date = dmy(date))
+
+    x<-x %>% as.data.frame() # %>% mutate(date = dmy(date))
             # data.frame(row.names = as.Date(x$date, format = "%Y-%mm-%dd"))  # %>%
             # select(-date)
     # date_depart <- as.Date(date_depart, format = "%Y-%mm-%dd")
     # date_fin <- as.Date(date_fin, format = "%Y-%mm-%dd")
-    date_depart <- paste(day(date_depart),"-",
-                  month(date_depart), "-",
-                  year(date_depart), sep = ""
-    )
-
-    date_fin <- paste(day(date_fin),"-",
-                         month(date_fin), "-",
-                         year(date_fin), sep = ""
-    )
 
     seqD<-seq.Date(from = as.Date(date_depart),
                    to = as.Date(date_fin),
-                   by = "1 day") #,
+                   length.out=as.numeric(difftime(as.Date(date_fin),as.Date(date_depart) ))) #,
                   # by=1)
-    d<-donnee[c(as.character(seqD)),]
-
+    d <- x %>% filter(date %in% as.character(seqD))
+    d <- d %>% drop_na()
     d
   }
 
@@ -190,8 +177,8 @@ shinyServer(function(input, output) {
   })
 
   donn_dep_by_date <- eventReactive(input$boutdate, {
-    don<-mef_don_dep(donneedep, input$range[2],
-                                input$range[1])
+    don<-mef_don_dep(donneedep, input$range[1],input$range[2])
+    don
   })
 
   donn_dep<- eventReactive(input$boutrange, {
@@ -211,24 +198,23 @@ shinyServer(function(input, output) {
 
 
   output$graph_sit<- renderPlotly(
-    ggplotly(
-      ggplot(data = donn_dep_by_date(),
-             aes(x = as.Date(date)), group = 0) +
-          geom_line(mapping = aes(y=hosp,
-                                  colour = "hosp")) +
+
+      ggplot(donn_dep_by_date(),
+             aes(x=as.Date(date)))+
+          geom_line(aes(y=hosp, colour="hosp")) +
           geom_line(mapping = aes(y=rea,
-                                  colour = "rea")) +
+                                   colour = "rea")) +
           scale_colour_manual("",
-                              breaks = c("hosp","rea"),
-                              values = c("blue", "orange")) +
+                             breaks = c("hosp","rea"),
+                             values = c("blue", "orange")) +
           xlab("Date") +
           ylab("Nombre de personne") +
           labs(title = "Situation hopitaux jour par jour")
-    ) )
+    )
 
   output$graph_cumul<- renderPlotly(
     ggplotly(
-      ggplot(data = donn_dep(),
+      ggplot(data = donn_dep_by_date(),
              aes(x = as.Date(date))) +
           geom_line(mapping = aes(y = incid_dchosp,
                                   colour = "deces")) +
@@ -244,7 +230,7 @@ shinyServer(function(input, output) {
 
   output$graph_nvx<- renderPlotly(
     ggplotly(
-      ggplot(data = donn_dep(),
+      ggplot(data = donn_dep_by_date(),
              aes(x = as.Date(date))) +
           geom_line(mapping = aes(y=incid_hosp,
                                   colour = "nvlleh")) +
@@ -293,39 +279,39 @@ shinyServer(function(input, output) {
   #   )
   # })
 
-France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
-#dep <- France %>%  dplyr::filter(nom %in% "Doubs")
+# France<- st_read(here::here("Dash_COVID/departements-20180101.shp"), quiet=TRUE)
+# #dep <- France %>%  dplyr::filter(nom %in% "Doubs")
+#
+#
+#
+#    output$mymap <- renderLeaflet({
+#      #donn_dep()$gueris
+#     bin <- c(0, 50, 100, Inf)
+#    pal <- colorBin("YlOrRd", domain =  donnc()$hosp, bins = bin)
+#
+#      isolate({
+#        long<-3 ; lat<-47 ; z=5.05
+#        leaflet() %>%
+#          setView(long,lat,z) %>%
+#          addProviderTiles("Esri.WorldTerrain")%>%
+#          addMiniMap(width = 75, height = 75, zoomLevelOffset = -7) %>%
+#          addPolylines(data = France, color="black", fillOpacity = 0,
+#                       weight = 1, opacity = 1) %>%
+#          addPolygons(data = donn(), stroke = FALSE, fillOpacity = 0.5, smoothFactor = 0.5,
+#                       color = ~colorQuantile("YlOrRd", hosp)(hosp) )
+#
+#      })
+#    })
 
 
-
-   output$mymap <- renderLeaflet({
-     #donn_dep()$gueris
-    bin <- c(0, 50, 100, Inf)
-   pal <- colorBin("YlOrRd", domain =  donnc()$hosp, bins = bin)
-
-     isolate({
-       long<-3 ; lat<-47 ; z=5.05
-       leaflet() %>%
-         setView(long,lat,z) %>%
-         addProviderTiles("Esri.WorldTerrain")%>%
-         addMiniMap(width = 75, height = 75, zoomLevelOffset = -7) %>%
-         addPolylines(data = France, color="black", fillOpacity = 0,
-                      weight = 1, opacity = 1) %>%
-         addPolygons(data = donn(), stroke = FALSE, fillOpacity = 0.5, smoothFactor = 0.5,
-                      color = ~colorQuantile("YlOrRd", hosp)(hosp) )
-
-     })
-   })
-
-
-  output$downloadData <- downloadHandler(
-    filename = function() {
-      paste('donn_dep', Sys.Date(), '.csv', sep='')
-    },
-    content = function(con) {
-      write.csv(donn_dep(), con)
-    }
-  )
+  # output$downloadData <- downloadHandler(
+  #   filename = function() {
+  #     paste('donn_dep', Sys.Date(), '.csv', sep='')
+  #   },
+  #   content = function(con) {
+  #     write.csv(donn_dep(), con)
+  #   }
+  # )
 
 
 

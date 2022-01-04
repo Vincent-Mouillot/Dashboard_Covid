@@ -307,6 +307,10 @@ don<-mef_don_dep(donneedep,
 glimpse(don)
 don
 
+seqD<-seq.Date(from = as.Date("2020-03-18"),
+               to = as.Date("2021-03-18"),
+               length.out = as.Date("2021-03-18")-as.Date("2020-03-18"))
+
 ggplotly(
   ggplot(data = don,
          aes(x = as.Date(date))) +
@@ -409,3 +413,47 @@ dat$lib_dep<-dat$lib_dep %>% as.data.frame() %>% apply(1, replace_acc_onglet1)
 dat<- dat %>% filter(lib_dep == input$loc)
 glimpse(dat)
 dat
+
+
+
+
+
+
+
+
+mef_don_dep<-function(x,date_depart,date_fin){
+  x<-x %>%
+    select(date,
+           hosp,
+           rea,
+           dchosp,
+           incid_hosp,
+           incid_rea,
+           incid_dchosp,
+           incid_rad
+    )
+
+  x<-x %>% as.data.frame() # %>% mutate(date = dmy(date))
+  # data.frame(row.names = as.Date(x$date, format = "%Y-%mm-%dd"))  # %>%
+  # select(-date)
+  # date_depart <- as.Date(date_depart, format = "%Y-%mm-%dd")
+  # date_fin <- as.Date(date_fin, format = "%Y-%mm-%dd")
+  # date_depart <- paste(day(date_depart),"-",
+  #                      month(date_depart), "-",
+  #                      year(date_depart), sep = ""
+  # )
+  #
+  # date_fin <- paste(day(date_fin),"-",
+  #                   month(date_fin), "-",
+  #                   year(date_fin), sep = ""
+  # )
+
+  seqD<-seq.Date(from = as.Date(date_depart),
+                 to = as.Date(date_fin),
+                 length.out=as.numeric(difftime(as.Date(date_fin),as.Date(date_depart) ))) #,
+  # by=1)
+  d <- x %>% filter(date %in% as.character(seqD))
+  d <- d %>% drop_na()
+  d
+}
+
