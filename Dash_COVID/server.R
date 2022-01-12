@@ -14,7 +14,6 @@ library(sf)
 library(leaflet)
 library(lubridate)
 library(tidyr)
-library(anytime)
 
 shinyServer(function(input, output) {
   #####Recup liste dep
@@ -123,7 +122,7 @@ shinyServer(function(input, output) {
 
   output$download <- downloadHandler(
     filename = function() {
-      paste('donn', Sys.Date(), '.csv', sep='')
+      paste('donnee_du_jour', Sys.Date(), '.csv', sep='')
     },
     content = function(con) {
       write.csv(donn(), con)
@@ -209,8 +208,7 @@ shinyServer(function(input, output) {
 
 
   output$graph_sit<- renderPlotly(
-
-      ggplot( donn_dep(),
+      ggplot(donn_dep(),
              aes(x=as.Date(date)))+
           geom_line(aes(y=hosp, colour="hosp")) +
           geom_line(mapping = aes(y=rea,
@@ -244,16 +242,29 @@ shinyServer(function(input, output) {
       ggplot(data = donn_dep(),
              aes(x = as.Date(date))) +
           geom_line(mapping = aes(y=incid_hosp,
-                                  colour = "nvlleh")) +
+                                  colour = "hopital")) +
           geom_line(mapping = aes(y=incid_rea,
-                                  colour = "nvller")) +
+                                  colour = "réa")) +
           scale_colour_manual("",
-                              breaks = c("nvlleh","nvller"),
+                              breaks = c("hopital","réa"),
                               values = c("blue", "orange")) +
           xlab("Date") +
           ylab("Nombre de personne") +
           labs(title = "Arrivée en hopital")
   ) )
+
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste('donnee_dep_periode', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+      write.csv(donn_dep(), con)
+    }
+  )
+
+
+
+
 
 
   #####3e onglet carto
@@ -315,14 +326,7 @@ shinyServer(function(input, output) {
 #    })
 
 
-  # output$downloadData <- downloadHandler(
-  #   filename = function() {
-  #     paste('donn_dep', Sys.Date(), '.csv', sep='')
-  #   },
-  #   content = function(con) {
-  #     write.csv(donn_dep(), con)
-  #   }
-  # )
+
 
 
 

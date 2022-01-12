@@ -10,7 +10,6 @@ library(stringr)
 
 
 
-
 # Header bar of the dashboard (ie le titre du projet)
 header <- dashboardHeader(title = "Dashboard sur les données du COVID",
                           titleWidth = 380)
@@ -72,7 +71,7 @@ body <- dashboardBody(
           width = 3,
           uiOutput("loc"),
           actionButton("bout", "Affichage"),
-          downloadButton('download', 'Téléchargement')
+          downloadButton('download', 'Téléchargement des données')
         ),
 
 
@@ -130,14 +129,14 @@ body <- dashboardBody(
                   choices = liste_departement() #pb avec France
       ),
       actionButton("boutrange",
-                   "Afficher des dates"),
-      downloadButton('downloadData', 'Telechargement'),
+                   "Afficher les graphiques"),
+      downloadButton('downloadData', 'Téléchargement des données'),
       width = 4
     ),
       mainPanel(
         plotlyOutput("graph_sit"),
         plotlyOutput("graph_cumul"),
-        plotlyOutput("graph_nvx")
+        plotlyOutput("graph_nvx"),
       )
      # actionButton de telechargement a ajouter soit sur le main panel soit side panel
       #ajouter input ggplot et input choix dep
