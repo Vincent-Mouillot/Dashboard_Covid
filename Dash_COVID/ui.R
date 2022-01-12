@@ -6,6 +6,7 @@ library(httr)
 library(jsonlite)
 library(dplyr)
 library(leaflet)
+library(stringr)
 
 
 
@@ -14,6 +15,29 @@ library(leaflet)
 header <- dashboardHeader(title = "Dashboard sur les données du COVID",
                           titleWidth = 380)
 
+
+liste_departement<-function(){
+  ldep<-"https://geo.api.gouv.fr/departements"
+  listede<-GET(ldep)
+  listede<-fromJSON(rawToChar(listede$content))
+
+  listede<-listede %>%
+    apply(2,replace_acc_onglet1) %>%
+    as.data.frame() %>%
+    select(nom) %>%
+    arrange(nom)
+  listede[,1]
+}
+
+replace_acc_onglet1<-function(x){
+  x <- str_replace_all(x,c("Ã¨" = "è", "Ã´" = "ô", "Ã©" = "é"))
+}
+
+replace_acc_onglet2<-function(x){
+  x <- str_replace_all(x,c("Ã¨" = "e", "Ã´" = "o", "Ã©" = "e", "ô"="o"))
+  x <-str_to_lower(x) # A modifier pour propre
+  x
+}
 
 # Menu depliant avec les deux onglets et les inputs du departement etc...
 sidebar <- dashboardSidebar(sidebarMenu(
@@ -80,17 +104,36 @@ body <- dashboardBody(
       tabName = "hist",
       h2("Visualisation sur une période"),
       sidebarPanel(
-        selectInput("dep_onglet2", "Choisissez le département",
-                    choices= liste_departement()),
-        # uiOutput("range_date"),
-        actionButton("boutrange",
-                     "Afficher des dates"),
-        uiOutput("range_date"),
-        actionButton("boutdate", "Afficher les graphiques"),
-        downloadButton('downloadData', 'Téléchargement'),
-        width = 4
-      ),
+      #   selectInput("dep_onglet2", "Choisissez le département",
+      #               choices= liste_departement()),
+      #   # uiOutput("range_date"),
+      #   actionButton("boutrange",
+      #                "Afficher des dates"),
+      #   uiOutput("range_date"),
+      #   actionButton("boutdate", "Afficher les graphiques"),
+      #   downloadButton('downloadData', 'Téléchargement'),
+      #   width = 4
+      # ),
 
+      dateRangeInput("range",
+                     "Selectionner la periode",
+                     min = "2020-03-18",
+                     max = Sys.Date(),
+                     start = "2020-03-18",
+                     end = Sys.Date(),
+                     weekstart = 1,
+                     # format = "dd/mm/yyyy",
+                     # language = "fr,
+                     separator = "au"),
+      selectInput("loc",
+                  "Choisir dep",
+                  choices = liste_departement() #pb avec France
+      ),
+      actionButton("boutrange",
+                   "Afficher des dates"),
+      downloadButton('downloadData', 'Telechargement'),
+      width = 4
+    ),
       mainPanel(
         plotlyOutput("graph_sit"),
         plotlyOutput("graph_cumul"),

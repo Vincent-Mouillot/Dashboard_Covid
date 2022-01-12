@@ -23,9 +23,9 @@ shinyServer(function(input, output) {
   }
 
   replace_acc_onglet2<-function(x){
-     x <- str_replace_all(x,c("Ã¨" = "e", "Ã´" = "o", "Ã©" = "e"))
-    str_to_lower(x) # A modifier pour propre
-
+    x <- str_replace_all(x,c("Ã¨" = "e", "Ã´" = "o", "Ã©" = "e", "ô"="o"))
+    x <-str_to_lower(x) # A modifier pour propre
+    x
   }
 
   liste_departement<-function(){
@@ -46,14 +46,14 @@ shinyServer(function(input, output) {
     sum(x, na.rm = TRUE)
   }
 
-  output$loc<-renderUI({
-    li_dep<-liste_departement()
-
-    selectInput("loc",
-                "Choisir dep",
-                choices = li_dep #pb avec France
-    )
-  })
+  # output$loc<-renderUI({
+  #   li_dep<-liste_departement()
+  #
+  #   selectInput("loc",
+  #               "Choisir dep",
+  #               choices = li_dep #pb avec France
+  #   )
+  # })
 
 
   donn <- eventReactive(input$bout, {
@@ -133,7 +133,19 @@ shinyServer(function(input, output) {
 
 
   #####Deuxieme onglet pour chaque dep
+
+  # output$ddep<-renderUI({
+  #   li_dep<-liste_departement()
+  #
+  #   selectInput("ddep",
+  #               "Choisir dep",
+  #               choices = li_dep #pb avec France
+  #   )
+  # })
+
+
   mef_don_dep<-function(x,date_depart,date_fin){
+    # x<-x %>% as.data.frame()
     x<-x %>%
       select(date,
              hosp,
@@ -145,55 +157,61 @@ shinyServer(function(input, output) {
              incid_rad
              )
 
-    x<-x %>% as.data.frame()
     seqD<-seq.Date(from = as.Date(date_depart),
                    to = as.Date(date_fin),
                    length.out=as.numeric(difftime(as.Date(date_fin),as.Date(date_depart) ))) #,
                   # by=1)
     d <- x %>% filter(date %in% as.character(seqD))
     d <- d %>% drop_na()
+
     d
   }
 
 
-  output$range_date <- renderUI({
-    dateRangeInput("range",
-                   "Selectionner la periode",
-                   min = min(as.Date(donn_dep()$date)),
-                   max = max(as.Date(donn_dep()$date)),
-                   start = min(as.Date(donn_dep()$date)),
-                   end = max(as.Date(donn_dep()$date)),
-                   weekstart = 1,
-                   format = "yyyy-mm-dd",
-                   # language = "fr",
-                   separator = "au")
+  # output$range_date <- renderUI({
+  #   dateRangeInput("range",
+  #                  "Selectionner la periode",
+  #                  #min = min(as.Date(donn_dep()$date)),
+  #                  #max = max(as.Date(donn_dep()$date)),
+  #                  min = "2019-01-01",
+  #                  max = Sys.Date() -2, # date d'avant-hier
+  #                  start = "2019-01-01", # min(as.Date(donn_dep()$date)),
+  #                  end = Sys.Date() -2 ,#max(as.Date(donn_dep()$date)),
+  #                  weekstart = 1,
+  #                  format = "yyyy-mm-dd",
+  #                  # language = "fr",
+  #                  separator = "au")
+  #
+  # })
 
-  })
-
-  donn_dep_by_date <- eventReactive(input$boutdate, {
-    don<-mef_don_dep(donneedep, input$range[1],input$range[2])
-    don
-  })
+  # donn_dep_by_date <- eventReactive(input$boutdate, {
+  #   don<-mef_don_dep(donn_dep, input$range[1],input$range[2])
+  #   don
+  # })
 
   donn_dep<- eventReactive(input$boutrange, {
+    as.character(replace_acc_onglet2(input$dep_onglet2))
     apdep<-paste(
       "https://coronavirusapifr.herokuapp.com/data/departement/",
-      as.character(replace_acc_onglet2(input$dep_onglet2)), #changer avec input mais recup liste dep avant
+      as.character(replace_acc_onglet2(input$loc)), #changer avec input mais recup liste dep avant
       sep = "")
     donndep<-GET(apdep)
     donneedep<-fromJSON(rawToChar(donndep$content))
-    glimpse(donneedep$allDataByDepartement)
+    glimpse(donneedep)
 
-     donneedep <- donneedep %>% na.omit()
-    donnee<- donneedep %>% as.data.frame()
+    don <- donneedep %>% as.data.frame()
+#    don <- don %>% na.omit()
     glimpse(don)
+
+    input$range
+    don<-mef_don_dep(don, input$range[1],input$range[2])
     don
   })
 
 
   output$graph_sit<- renderPlotly(
 
-      ggplot(donn_dep_by_date(),
+      ggplot( donn_dep(),
              aes(x=as.Date(date)))+
           geom_line(aes(y=hosp, colour="hosp")) +
           geom_line(mapping = aes(y=rea,
@@ -208,7 +226,7 @@ shinyServer(function(input, output) {
 
   output$graph_cumul<- renderPlotly(
     ggplotly(
-      ggplot(data = donn_dep_by_date(),
+      ggplot(data = donn_dep(),
              aes(x = as.Date(date))) +
           geom_line(mapping = aes(y = incid_dchosp,
                                   colour = "deces")) +
@@ -224,7 +242,7 @@ shinyServer(function(input, output) {
 
   output$graph_nvx<- renderPlotly(
     ggplotly(
-      ggplot(data = donn_dep_by_date(),
+      ggplot(data = donn_dep(),
              aes(x = as.Date(date))) +
           geom_line(mapping = aes(y=incid_hosp,
                                   colour = "nvlleh")) +
