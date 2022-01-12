@@ -190,7 +190,6 @@ shinyServer(function(input, output) {
   # })
 
   donn_dep<- eventReactive(input$boutrange, {
-    as.character(replace_acc_onglet2(input$dep_onglet2))
     apdep<-paste(
       "https://coronavirusapifr.herokuapp.com/data/departement/",
       as.character(replace_acc_onglet2(input$loc)), #changer avec input mais recup liste dep avant
