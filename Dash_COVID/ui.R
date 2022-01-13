@@ -71,13 +71,11 @@ body <- dashboardBody(
           width = 3,
           uiOutput("loc"),
           actionButton("bout", "Affichage"),
-          downloadButton('download', 'Téléchargement des données')
+          downloadButton('download', 'Télécharger les données')
         ),
 
 
         mainPanel( # 3lignes de deux values box
-
-
           h2(),
           fluidRow(
             valueBoxOutput("hosp"), #CHANGER les noms
@@ -115,7 +113,7 @@ body <- dashboardBody(
       # ),
 
       dateRangeInput("range",
-                     "Selectionner la periode",
+                     "Sélectionnez un periode",
                      min = "2020-03-18",
                      max = Sys.Date(),
                      start = "2020-03-18",
@@ -125,18 +123,29 @@ body <- dashboardBody(
                      # language = "fr,
                      separator = "au"),
       selectInput("loc",
-                  "Choisir dep",
+                  "Choisir un département",
                   choices = liste_departement() #pb avec France
       ),
       actionButton("boutrange",
                    "Afficher les graphiques"),
-      downloadButton('downloadData', 'Téléchargement des données'),
+      downloadButton('downloadData', 'Télécharger les données'),
       width = 4
     ),
       mainPanel(
         plotlyOutput("graph_sit"),
+        fluidRow(
+          valueBoxOutput("tot_hosp"),
+          valueBoxOutput("tot_rea")),
+
         plotlyOutput("graph_cumul"),
+        fluidRow(
+          valueBoxOutput("tot_dc"),
+          valueBoxOutput("tot_gue")),
+
         plotlyOutput("graph_nvx"),
+        fluidRow(
+          valueBoxOutput("tot_hos"),
+          valueBoxOutput("tot_ad")),
       )
      # actionButton de telechargement a ajouter soit sur le main panel soit side panel
       #ajouter input ggplot et input choix dep

@@ -98,8 +98,7 @@ shinyServer(function(input, output) {
   output$hosp <- renderValueBox({
     valueBox(donn()[,2],
              subtitle = "Hospitalisation",
-             icon ('hospital'),
-             color = "aqua")
+             icon ('hospital'))
   })
 
 
@@ -265,6 +264,44 @@ shinyServer(function(input, output) {
           ylab("Nombre de personne") +
           labs(title = "Arrivée en hopital")
   ) )
+
+  output$tot_hosp <- renderValueBox({
+    valueBox(sum(donn_dep()$hosp),
+             subtitle = "Total d'hospitalisés sur la période",
+             color = 'blue')
+  })
+
+  output$tot_rea <- renderValueBox({
+    valueBox(sum(donn_dep()$rea),
+             subtitle = "Total en réa sur la période",
+             color = 'orange')
+  })
+
+  output$tot_dc <- renderValueBox({
+    valueBox(sum(donn_dep()$incid_dchosp),
+             subtitle = "Total de mort à l'hopital sur la période",
+             color = 'blue')
+  })
+
+  output$tot_gue <- renderValueBox({
+    valueBox(sum(donn_dep()$incid_rad),
+             subtitle = "Total de guéris sur la période",
+             color = 'orange')
+  })
+
+  output$tot_hos <- renderValueBox({
+    valueBox(sum(donn_dep()$incid_hosp),
+             subtitle = "Total admis à l'hopital sur la période",
+             color = 'blue')
+  })
+
+  output$tot_ad <- renderValueBox({
+    valueBox(sum(donn_dep()$incid_rea),
+             subtitle = "Total admis en rée sur la période",
+             color = 'orange')
+  })
+
+
 
   output$downloadData <- downloadHandler(
     filename = function() {
