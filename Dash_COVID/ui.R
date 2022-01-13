@@ -42,10 +42,10 @@ replace_acc_onglet2<-function(x){
 sidebar <- dashboardSidebar(sidebarMenu(
   menuItem("Situation un jour donné",
            tabName = "sitj",
-           icon = icon("head-side-virus")),
+           icon = icon("calendar-alt")),
   menuItem("Historique",
            tabName = "hist",
-           icon = icon("grunt"))
+           icon = icon("book-open"))
   # menuItem("Carte",
   #          tabName = "carto",
   #          icon = icon("grunt"))

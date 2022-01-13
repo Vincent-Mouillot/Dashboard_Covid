@@ -96,28 +96,41 @@ shinyServer(function(input, output) {
   })
 
   output$hosp <- renderValueBox({
-    valueBox(donn()[,2], subtitle = "Hospitalisation")
+    valueBox(donn()[,2],
+             subtitle = "Hospitalisation",
+             icon ('hospital'),
+             color = "aqua")
   })
 
 
   output$rea <- renderValueBox({
-    valueBox(donn()[,3], subtitle = "Réanimation")
+    valueBox(donn()[,3],
+             subtitle = "Réanimation",
+             icon ('bed'))
   })
 
   output$nhosp <- renderValueBox({
-    valueBox(donn()[,4], subtitle = "Nouvelle Hospitalisation")
+    valueBox(donn()[,4],
+             subtitle = "Nouvelle Hospitalisation",
+             icon ('plus'))
   })
 
   output$nrea <- renderValueBox({
-    valueBox(donn()[,5], subtitle = "Nouvelle Réanimation")
+    valueBox(donn()[,5],
+             subtitle = "Nouvelle Réanimation",
+             icon ('plus'))
   })
 
   output$de <- renderValueBox({
-    valueBox(donn()[,6], subtitle = "Décès")
+    valueBox(donn()[,6],
+             subtitle = "Décès",
+             icon ('heart-broken'))
   })
 
   output$gu <- renderValueBox({
-    valueBox(donn()[,7], subtitle = "Guérison")
+    valueBox(donn()[,7],
+             subtitle = "Guérison",
+             icon ('heart'))
   })
 
   output$download <- downloadHandler(
