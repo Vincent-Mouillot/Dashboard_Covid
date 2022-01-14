@@ -73,7 +73,6 @@ shinyServer(function(input, output) {
       as.data.frame() %>%
       apply(1, replace_acc_onglet1)
     dat <- dat %>% filter(lib_dep == input$loc)
-    glimpse(dat)
     dat
   })
 
@@ -164,10 +163,8 @@ shinyServer(function(input, output) {
     )
     donndep <- GET(apdep)
     donneedep <- fromJSON(rawToChar(donndep$content))
-    glimpse(donneedep)
 
     don <- donneedep %>% as.data.frame()
-    glimpse(don)
 
     input$range
     don <- mef_don_dep(don, input$range[1], input$range[2])
