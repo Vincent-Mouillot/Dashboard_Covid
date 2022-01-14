@@ -268,7 +268,7 @@ shinyServer(function(input, output) {
 
   output$tot_ad <- renderValueBox({
     valueBox(sum(donn_dep()$incid_rea),
-      subtitle = "Total admis en rée sur la période",
+      subtitle = "Total admis en réa sur la période",
       color = "orange"
     )
   })

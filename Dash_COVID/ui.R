@@ -119,19 +119,28 @@ body <- dashboardBody(
         width = 4
       ),
       mainPanel(
-        plotlyOutput("graph_sit"),
-        plotlyOutput("graph_cumul"),
-        fluidRow(
-          valueBoxOutput("tot_dc"),
-          valueBoxOutput("tot_gue")
-        ),
-        plotlyOutput("graph_nvx"),
-        fluidRow(
-          valueBoxOutput("tot_hos"),
-          valueBoxOutput("tot_ad")
-        ),
-      )
+        tabsetPanel(
+          tabPanel("Situation des hôpitaux",plotlyOutput("graph_sit")
+                   ),
+          tabPanel("Nombre décès et guérison",
+                   plotlyOutput("graph_cumul"),
+                   fluidRow(
+                     valueBoxOutput("tot_dc"),
+                     valueBoxOutput("tot_gue")
+                   )
+          ),
+          tabPanel("Nouvelle admission",
+                   plotlyOutput("graph_nvx"),
+                   fluidRow(
+                     valueBoxOutput("tot_hos"),
+                     valueBoxOutput("tot_ad")
+                   )
+          )
+        )
     )
+    )
+  )
+)
     # tabItem(
     #   tabName = "carto",
     #   sidebarPanel(
@@ -160,8 +169,6 @@ body <- dashboardBody(
     #
     #   )
     # )
-  )
-)
 
 # Mise en page du dashboard
 dashboardPage(
