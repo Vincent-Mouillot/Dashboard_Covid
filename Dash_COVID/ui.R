@@ -125,15 +125,15 @@ body <- dashboardBody(
           tabPanel("Nombre décès et guérison",
                    plotlyOutput("graph_cumul"),
                    fluidRow(
-                     valueBoxOutput("tot_dc"),
-                     valueBoxOutput("tot_gue")
+                     valueBoxOutput("tot_dc", width = 5),
+                     valueBoxOutput("tot_gue", width = 5)
                    )
           ),
           tabPanel("Nouvelle admission",
                    plotlyOutput("graph_nvx"),
                    fluidRow(
-                     valueBoxOutput("tot_hos"),
-                     valueBoxOutput("tot_ad")
+                     valueBoxOutput("tot_hos", width = 5),
+                     valueBoxOutput("tot_ad", width = 5)
                    )
           )
         )
