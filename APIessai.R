@@ -457,3 +457,37 @@ mef_don_dep<-function(x,date_depart,date_fin){
   d
 }
 
+
+seq_date <- seq.Date(as.Date("10-10-2020", "%d-%m-%Y"), as.Date("10-11-2020", "%d-%m-%Y"), by = 1)
+
+
+det <- function(date){
+  date <- paste(day(date), "-", month(date), "-", year(date), sep = "")
+
+  apdep <- paste(
+    "https://coronavirusapifr.herokuapp.com/data/france-by-date/",
+       as.character(date), sep = "")
+
+  donndep <- GET(apdep)
+  donneedep <- fromJSON(rawToChar(donndep$content))
+  don <- donneedep %>% as.data.frame() %>%
+    select(date,
+           hosp,
+           rea,
+           dchosp,
+           incid_hosp,
+           incid_rea,
+           incid_dchosp,
+           incid_rad
+    )
+  a <- c(don[1,1], as.numeric(don[1,seq(2,8,1)]))
+  return(don)
+}
+
+
+France_temps <- det(seq_date[1])
+for (i in 1:length(seq_date)){
+  France_temps <- rbind(France_temps, det(seq_date[i]))
+}
+
+# France_temps <- seq_date %>% map(function(x) rbind(France_temps, det(x)))

@@ -155,7 +155,39 @@ shinyServer(function(input, output) {
     d
   }
 
+  det <- function(date){
+    date <- paste(day(date), "-", month(date), "-", year(date), sep = "")
+
+    apdep <- paste(
+      "https://coronavirusapifr.herokuapp.com/data/france-by-date/",
+      as.character(date), sep = "")
+
+    donndep <- GET(apdep)
+    donneedep <- fromJSON(rawToChar(donndep$content))
+    don <- donneedep %>% as.data.frame() %>%
+      select(date,
+             hosp,
+             rea,
+             dchosp,
+             incid_hosp,
+             incid_rea,
+             incid_dchosp,
+             incid_rad
+      )
+    return(don)
+  }
+
   donn_dep <- eventReactive(input$boutrange, {
+    if(input$loc == "France"){
+      seq_date <- seq.Date(as.Date(input$range[1], "%d-%m-%Y"),
+                           as.Date(input$range[2], "%d-%m-%Y"), by = 1)
+      don <- det(seq_date[1])
+      for (i in 1:length(seq_date)){
+        don <- rbind(don, det(seq_date[i]))
+      }
+
+    }
+    else{
     apdep <- paste(
       "https://coronavirusapifr.herokuapp.com/data/departement/",
       as.character(replace_acc_onglet2(input$loc)), # changer avec input mais recup liste dep avant
@@ -165,9 +197,7 @@ shinyServer(function(input, output) {
     donneedep <- fromJSON(rawToChar(donndep$content))
 
     don <- donneedep %>% as.data.frame()
-
-    input$range
-    don <- mef_don_dep(don, input$range[1], input$range[2])
+    don <- mef_don_dep(don, input$range[1], input$range[2])}
     don
   })
 
@@ -243,28 +273,28 @@ shinyServer(function(input, output) {
 
 
   output$tot_dc <- renderValueBox({
-    valueBox(sum(donn_dep()$incid_dchosp),
+    valueBox(sum(donn_dep()$incid_dchosp, na.rm = TRUE),
       subtitle = "Total de mort à l'hopital sur la période",
       color = "blue"
     )
   })
 
   output$tot_gue <- renderValueBox({
-    valueBox(sum(donn_dep()$incid_rad),
+    valueBox(sum(donn_dep()$incid_rad, na.rm = TRUE),
       subtitle = "Total de guéris sur la période",
       color = "orange"
     )
   })
 
   output$tot_hos <- renderValueBox({
-    valueBox(sum(donn_dep()$incid_hosp),
+    valueBox(sum(donn_dep()$incid_hosp, na.rm = TRUE),
       subtitle = "Total admis à l'hopital sur la période",
       color = "blue"
     )
   })
 
   output$tot_ad <- renderValueBox({
-    valueBox(sum(donn_dep()$incid_rea),
+    valueBox(sum(donn_dep()$incid_rea, na.rm = TRUE),
       subtitle = "Total admis en réa sur la période",
       color = "orange"
     )

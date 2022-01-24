@@ -101,15 +101,15 @@ body <- dashboardBody(
         dateRangeInput("range",
           "Sélectionnez un periode",
           min = "2020-03-18",
-          max = Sys.Date(),
+          max = Sys.Date()-2,
           start = "2020-03-18",
-          end = Sys.Date(),
+          end = Sys.Date()-2,
           weekstart = 1,
           separator = "au"
         ),
         selectInput("loc",
           "Choisir un département",
-          choices = liste_departement() # pb avec France
+          choices = c("France",liste_departement()) # pb avec France
         ),
         actionButton(
           "boutrange",
